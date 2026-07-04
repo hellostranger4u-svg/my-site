@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hellostranger4u-svg.github.io/my-site/sitemap.xml

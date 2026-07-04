@@ -4,8 +4,36 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>오늘의 한 권 — 초등학생 추천 도서</title>
+  <meta name="description" content="초등학교 1~6학년 맞춤 도서 추천 서비스. 매일 한 권, 문학·비문학 360권의 엄선된 어린이 도서를 만나보세요." />
+  <meta name="keywords" content="초등학생 추천 도서, 어린이 책 추천, 초등 독서, 학년별 추천 도서, 오늘의 한 권" />
+  <meta name="author" content="오늘의 한 권" />
+  <link rel="canonical" href="https://hellostranger4u-svg.github.io/my-site/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="오늘의 한 권 — 초등학생 추천 도서" />
+  <meta property="og:description" content="초등학교 1~6학년 맞춤 도서 추천 서비스. 매일 한 권, 문학·비문학 360권의 엄선된 어린이 도서를 만나보세요." />
+  <meta property="og:url" content="https://hellostranger4u-svg.github.io/my-site/" />
+  <meta property="og:locale" content="ko_KR" />
+  <meta property="og:site_name" content="오늘의 한 권" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="오늘의 한 권 — 초등학생 추천 도서" />
+  <meta name="twitter:description" content="초등학교 1~6학년 맞춤 도서 추천 서비스. 매일 한 권, 문학·비문학 360권의 엄선된 어린이 도서를 만나보세요." />
+  <meta name="robots" content="index, follow" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "오늘의 한 권",
+    "url": "https://hellostranger4u-svg.github.io/my-site/",
+    "description": "초등학교 1~6학년 맞춤 도서 추천 서비스. 매일 한 권, 문학·비문학 360권의 엄선된 어린이 도서를 만나보세요.",
+    "inLanguage": "ko",
+    "publisher": {
+      "@type": "Organization",
+      "name": "오늘의 한 권"
+    }
+  }
+  </script>
   <style>
     /* ── 디자인 시스템: 슬랙 · 컬러풀 ── */
     :root {
@@ -124,6 +152,15 @@
       color: #888;
       font-size: 14px;
     }
+    .footer__links { display: flex; justify-content: center; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
+    .footer__links button { background: none; border: none; color: #888; font-size: 13px; cursor: pointer; font-family: 'Inter', sans-serif; padding: 0; }
+    .footer__links button:hover { color: var(--accent); text-decoration: underline; }
+    .policy-page { max-width: 680px; margin: 0 auto; padding: 40px 20px; }
+    .policy-page h2 { font-size: 24px; margin-bottom: 24px; color: var(--primary); }
+    .policy-page h3 { font-size: 17px; margin: 24px 0 8px; color: var(--text); }
+    .policy-page p, .policy-page li { font-size: 15px; line-height: 1.8; color: #444; margin-bottom: 8px; }
+    .policy-page ul { padding-left: 20px; margin-bottom: 16px; }
+    .policy-page .back-btn { margin-bottom: 24px; }
 
     /* ── 히어로 ── */
     .hero { text-align: center; padding: 60px 0 40px; }
@@ -1519,7 +1556,71 @@
     function renderFooter() {
       return '<footer class="footer"><div class="container">' +
         '<p>&copy; ' + new Date().getFullYear() + ' 오늘의 한 권 &mdash; 매일 한 권, 읽는 습관을 만들어요 \u{1F4DA}</p>' +
+        '<div class="footer__links">' +
+          '<button onclick="navigate(\'about\')">소개</button>' +
+          '<button onclick="navigate(\'privacy\')">개인정보처리방침</button>' +
+          '<button onclick="navigate(\'contact\')">문의하기</button>' +
+        '</div>' +
       '</div></footer>';
+    }
+
+    function renderPrivacyPage() {
+      return '<div class="policy-page">' +
+        '<button class="btn btn--outline back-btn" onclick="navigate(\'home\')">&larr; 돌아가기</button>' +
+        '<h2>개인정보처리방침</h2>' +
+        '<p>「오늘의 한 권」(이하 "사이트")은 이용자의 개인정보를 소중히 여기며, 관련 법령에 따라 아래와 같이 개인정보처리방침을 안내합니다.</p>' +
+        '<h3>1. 수집하는 개인정보</h3>' +
+        '<p>본 사이트는 별도의 회원가입 절차 없이 이용할 수 있으며, 서버에 개인정보를 수집·저장하지 않습니다. 읽기 기록과 즐겨찾기는 이용자의 브라우저(localStorage)에만 저장되며, 외부로 전송되지 않습니다.</p>' +
+        '<h3>2. 쿠키 및 광고</h3>' +
+        '<p>본 사이트는 Google 애드센스를 통해 광고를 게재할 수 있으며, 이 과정에서 Google이 쿠키를 사용하여 이용자의 관심사에 기반한 광고를 표시할 수 있습니다.</p>' +
+        '<ul>' +
+          '<li>Google의 쿠키 사용에 대한 자세한 정보는 <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener">Google 광고 정책</a>에서 확인할 수 있습니다.</li>' +
+          '<li>이용자는 <a href="https://adssettings.google.com" target="_blank" rel="noopener">Google 광고 설정</a>에서 맞춤 광고를 비활성화할 수 있습니다.</li>' +
+        '</ul>' +
+        '<h3>3. 제3자 제공</h3>' +
+        '<p>본 사이트는 이용자의 개인정보를 제3자에게 제공하지 않습니다.</p>' +
+        '<h3>4. 아동의 개인정보 보호</h3>' +
+        '<p>본 사이트는 초등학생을 대상으로 하며, 만 14세 미만 아동의 개인정보를 수집하지 않습니다. 모든 기능은 개인정보 입력 없이 이용 가능합니다.</p>' +
+        '<h3>5. 방침 변경</h3>' +
+        '<p>본 방침은 2026년 7월 4일부터 적용되며, 변경 시 사이트를 통해 공지합니다.</p>' +
+      '</div>';
+    }
+
+    function renderAboutPage() {
+      return '<div class="policy-page">' +
+        '<button class="btn btn--outline back-btn" onclick="navigate(\'home\')">&larr; 돌아가기</button>' +
+        '<h2>오늘의 한 권 소개</h2>' +
+        '<p>「오늘의 한 권」은 초등학교 1학년부터 6학년까지, 매일 한 권의 책을 추천하는 도서 추천 서비스입니다.</p>' +
+        '<h3>우리의 목표</h3>' +
+        '<p>어린이들이 매일 꾸준히 책을 읽는 습관을 기를 수 있도록 돕는 것입니다. 학년과 수준에 맞는 양질의 도서를 엄선하여 추천합니다.</p>' +
+        '<h3>어떤 책을 추천하나요?</h3>' +
+        '<ul>' +
+          '<li>학년별 60권 (문학 30권 + 비문학 30권), 총 360권의 도서를 엄선했습니다.</li>' +
+          '<li>현대 아동문학, 그림책, 과학·역사·사회 교양서 등 다양한 장르를 포함합니다.</li>' +
+          '<li>모든 도서는 초등학생의 눈높이에 맞춰 선정되었습니다.</li>' +
+        '</ul>' +
+        '<h3>주요 기능</h3>' +
+        '<ul>' +
+          '<li>매일 새로운 도서 추천 (날짜 기반 자동 교체)</li>' +
+          '<li>문학 / 비문학 카테고리 선택</li>' +
+          '<li>읽기 완료 체크 및 진행률 확인</li>' +
+          '<li>즐겨찾기 기능</li>' +
+          '<li>태그별 도서 필터링 및 검색</li>' +
+        '</ul>' +
+      '</div>';
+    }
+
+    function renderContactPage() {
+      return '<div class="policy-page">' +
+        '<button class="btn btn--outline back-btn" onclick="navigate(\'home\')">&larr; 돌아가기</button>' +
+        '<h2>문의하기</h2>' +
+        '<p>「오늘의 한 권」에 대한 문의, 건의, 오류 신고는 아래 방법으로 연락해 주세요.</p>' +
+        '<h3>이메일</h3>' +
+        '<p><a href="mailto:hellostranger4u@gmail.com">hellostranger4u@gmail.com</a></p>' +
+        '<h3>GitHub</h3>' +
+        '<p><a href="https://github.com/hellostranger4u-svg/my-site/issues" target="_blank" rel="noopener">GitHub Issues</a>에서 버그 리포트나 기능 제안을 남겨주세요.</p>' +
+        '<p>소중한 의견 감사합니다. 빠른 시일 내에 답변드리겠습니다.</p>' +
+      '</div>';
     }
 
     function renderHomePage() {
@@ -1803,6 +1904,12 @@
         pageContent = renderCategoryPage(currentParams.grade || 1);
       } else if (currentPage === 'recommend') {
         pageContent = renderRecommendPage(currentParams.grade || 1, currentParams.category || '전체');
+      } else if (currentPage === 'privacy') {
+        pageContent = renderPrivacyPage();
+      } else if (currentPage === 'about') {
+        pageContent = renderAboutPage();
+      } else if (currentPage === 'contact') {
+        pageContent = renderContactPage();
       }
       document.getElementById('app').innerHTML =
         renderHeader() + '<main>' + pageContent + '</main>' + renderFooter();
