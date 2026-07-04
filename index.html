@@ -7,11 +7,11 @@
   <meta name="description" content="초등학교 1~6학년 맞춤 도서 추천 서비스. 매일 한 권, 문학·비문학 360권의 엄선된 어린이 도서를 만나보세요." />
   <meta name="keywords" content="초등학생 추천 도서, 어린이 책 추천, 초등 독서, 학년별 추천 도서, 오늘의 한 권" />
   <meta name="author" content="오늘의 한 권" />
-  <link rel="canonical" href="https://hellostranger4u-svg.github.io/my-site/" />
+  <link rel="canonical" href="https://onti.kr/" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="오늘의 한 권 — 초등학생 추천 도서" />
   <meta property="og:description" content="초등학교 1~6학년 맞춤 도서 추천 서비스. 매일 한 권, 문학·비문학 360권의 엄선된 어린이 도서를 만나보세요." />
-  <meta property="og:url" content="https://hellostranger4u-svg.github.io/my-site/" />
+  <meta property="og:url" content="https://onti.kr/" />
   <meta property="og:locale" content="ko_KR" />
   <meta property="og:site_name" content="오늘의 한 권" />
   <meta name="twitter:card" content="summary" />
@@ -25,7 +25,7 @@
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "오늘의 한 권",
-    "url": "https://hellostranger4u-svg.github.io/my-site/",
+    "url": "https://onti.kr/",
     "description": "초등학교 1~6학년 맞춤 도서 추천 서비스. 매일 한 권, 문학·비문학 360권의 엄선된 어린이 도서를 만나보세요.",
     "inLanguage": "ko",
     "publisher": {
@@ -1531,12 +1531,56 @@
     var currentPage = 'home';
     var currentParams = {};
 
+    function pageToHash(page, params) {
+      params = params || {};
+      if (page === 'home') return '#/';
+      if (page === 'category') return '#/grade/' + params.grade;
+      if (page === 'recommend') {
+        var cat = params.category || '전체';
+        if (cat === '문학') return '#/grade/' + params.grade + '/literature';
+        if (cat === '비문학') return '#/grade/' + params.grade + '/non-literature';
+        return '#/grade/' + params.grade + '/all';
+      }
+      if (page === 'privacy') return '#/privacy';
+      if (page === 'about') return '#/about';
+      if (page === 'contact') return '#/contact';
+      return '#/';
+    }
+
+    function hashToPage(hash) {
+      hash = hash || '#/';
+      var parts = hash.replace('#/', '').split('/');
+      if (parts[0] === 'grade' && parts[1]) {
+        var g = parseInt(parts[1]);
+        if (parts[2] === 'literature') return {page:'recommend', params:{grade:g, category:'문학'}};
+        if (parts[2] === 'non-literature') return {page:'recommend', params:{grade:g, category:'비문학'}};
+        if (parts[2] === 'all') return {page:'recommend', params:{grade:g, category:'전체'}};
+        return {page:'category', params:{grade:g}};
+      }
+      if (parts[0] === 'privacy') return {page:'privacy', params:{}};
+      if (parts[0] === 'about') return {page:'about', params:{}};
+      if (parts[0] === 'contact') return {page:'contact', params:{}};
+      return {page:'home', params:{}};
+    }
+
     function navigate(page, params) {
       currentPage = page;
       currentParams = params || {};
+      var newHash = pageToHash(page, currentParams);
+      if (window.location.hash !== newHash) window.location.hash = newHash;
       render();
       window.scrollTo(0, 0);
     }
+
+    window.addEventListener('hashchange', function() {
+      var parsed = hashToPage(window.location.hash);
+      if (parsed.page !== currentPage || JSON.stringify(parsed.params) !== JSON.stringify(currentParams)) {
+        currentPage = parsed.page;
+        currentParams = parsed.params;
+        render();
+        window.scrollTo(0, 0);
+      }
+    });
 
     function renderHeader() {
       return '<header class="header"><div class="container header__inner">' +
@@ -1928,6 +1972,9 @@
       }
     });
 
+    var initState = hashToPage(window.location.hash);
+    currentPage = initState.page;
+    currentParams = initState.params;
     render();
   </script>
 </body>
