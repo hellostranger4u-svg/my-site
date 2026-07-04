@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>오늘의 한 권 — 초등학생 추천 도서</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── 디자인 시스템: 슬랙 · 컬러풀 ── */
+    :root {
+      --primary: #4A154B;
+      --accent: #1264A3;
+      --green: #2EB67D;
+      --yellow: #ECB22E;
+      --text: #1D1C1D;
+      --bg: #FFFFFF;
+      --border: #E8E8E8;
+      --surface: #F8F8F8;
+      --radius-card: 16px;
+      --shadow: 0 2px 12px rgba(0,0,0,.08);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── 페이지 전환 애니메이션 ── */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    main { animation: fadeInUp .35s ease-out; }
+
+    /* ── 스크롤 시 헤더 그림자 (JS에서 토글) ── */
+    .header--scrolled { box-shadow: 0 2px 12px rgba(0,0,0,.15); }
+
+    h1, h2, h3, h4 { font-weight: 700; line-height: 1.3; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    img { max-width: 100%; display: block; }
+
+    /* ── 버튼: 둥근 알약 ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 12px 22px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: filter .15s, transform .15s;
+    }
+    .btn:hover { filter: brightness(.92); transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn--accent { background: var(--accent); }
+    .btn--green  { background: var(--green); }
+    .btn--yellow { background: var(--yellow); color: var(--text); }
+    .btn--outline {
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+    .btn--outline:hover { background: var(--primary); color: #fff; }
+
+    /* ── 레이아웃 ── */
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+
+    /* ── 헤더 ── */
+    .header {
+      background: var(--primary);
+      color: #fff;
+      padding: 16px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header__inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .header__logo {
+      font-size: 22px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #fff;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: inherit;
+    }
+    .header__logo:hover { opacity: .9; }
+    .header__nav { display: flex; align-items: center; gap: 12px; }
+    .header__nav-btn {
+      color: #fff;
+      border-color: rgba(255,255,255,.4);
+      padding: 8px 18px;
+      font-size: 13px;
+    }
+
+    /* ── 푸터 ── */
+    .footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      margin-top: 80px;
+      text-align: center;
+      color: #888;
+      font-size: 14px;
+    }
+
+    /* ── 히어로 ── */
+    .hero { text-align: center; padding: 60px 0 40px; }
+    .hero h1 { font-size: 36px; margin-bottom: 12px; }
+    .hero p { font-size: 18px; color: #666; max-width: 520px; margin: 0 auto; }
+
+    /* ── 학년 선택 그리드 ── */
+    .grade-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      padding-bottom: 40px;
+    }
+    .grade-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 36px 24px;
+      cursor: pointer;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-card);
+      background: var(--bg);
+      text-align: center;
+      font-family: inherit;
+      box-shadow: var(--shadow);
+      transition: transform .2s, box-shadow .2s, border-color .2s;
+    }
+    .grade-card:hover {
+      border-color: var(--grade-color);
+      transform: translateY(-6px);
+      box-shadow: 0 12px 32px rgba(0,0,0,.1);
+    }
+    .grade-card__emoji { font-size: 42px; line-height: 1; }
+    .grade-card__label { font-size: 22px; font-weight: 700; color: var(--text); }
+    .grade-card__sub { font-size: 13px; color: #888; font-weight: 500; }
+
+    /* ── 추천 페이지 ── */
+    .recommend-header {
+      text-align: center;
+      padding: 48px 0 32px;
+    }
+    .recommend-header__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #666;
+      margin-bottom: 16px;
+    }
+    .recommend-header h1 {
+      font-size: 30px;
+      margin-bottom: 8px;
+    }
+    .recommend-header p {
+      font-size: 16px;
+      color: #888;
+    }
+
+    .today-card {
+      max-width: 720px;
+      margin: 0 auto 48px;
+      border-radius: var(--radius-card);
+      border: 2px solid var(--border);
+      background: var(--bg);
+      box-shadow: 0 4px 20px rgba(0,0,0,.08);
+      overflow: hidden;
+    }
+    .today-card__top {
+      display: flex;
+      gap: 28px;
+      padding: 32px;
+    }
+    .today-card__cover {
+      width: 140px;
+      min-height: 190px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 56px;
+      flex-shrink: 0;
+    }
+    .today-card__info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .today-card__label {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--green);
+      border-radius: 999px;
+      padding: 4px 12px;
+      width: fit-content;
+    }
+    .today-card__title {
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .today-card__author {
+      font-size: 14px;
+      color: #888;
+    }
+    .today-card__meta {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+    .tag--comic {
+      background: #FF6B6B !important;
+      color: #fff !important;
+      border-color: #FF6B6B !important;
+    }
+    .book-list-item__comic {
+      display: inline-block;
+      background: #FF6B6B;
+      color: #fff;
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 999px;
+      font-weight: 700;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+    .today-card__tag {
+      font-size: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 4px 10px;
+      color: #666;
+    }
+    .today-card__reason {
+      background: var(--surface);
+      padding: 24px 32px;
+      border-top: 1px solid var(--border);
+    }
+    .today-card__reason-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .today-card__reason-text {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #444;
+    }
+
+    /* ── 리뷰 영역 ── */
+    .review-section {
+      padding: 20px 32px 24px;
+      border-top: 1px solid var(--border);
+    }
+    .review-section__title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .review-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+    }
+    .review-item:last-child { margin-bottom: 0; }
+    .review-item__header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .review-item__avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .review-item__name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .review-item__stars {
+      font-size: 12px;
+      margin-left: auto;
+      color: var(--yellow);
+    }
+    .review-item__text {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #555;
+    }
+
+    /* ── 오늘의 도서 새로고침 버튼 ── */
+    .refresh-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: #666;
+      cursor: pointer;
+      transition: all .2s;
+      margin-top: 12px;
+    }
+    .refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .refresh-btn svg { transition: transform .3s; }
+    .refresh-btn:hover svg { transform: rotate(180deg); }
+
+    /* ── 구매 링크 버튼 ── */
+    .buy-links {
+      padding: 0 32px 24px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .buy-links__title {
+      width: 100%;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .buy-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+      transition: all .15s;
+    }
+    .buy-link:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      text-decoration: none;
+    }
+
+    /* 모달 내 리뷰/구매 */
+    .modal__reviews { padding: 16px 28px; border-top: 1px solid var(--border); }
+    .modal__reviews .review-section__title { margin-bottom: 10px; }
+    .modal__buy { padding: 0 28px 20px; display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .other-books {
+      max-width: 720px;
+      margin: 0 auto;
+      padding-bottom: 20px;
+    }
+    .other-books__title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .book-list-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 10px;
+      background: var(--bg);
+      transition: box-shadow .2s, transform .15s;
+    }
+    .book-list-item:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,.08);
+      transform: translateY(-2px);
+    }
+    .book-list-item__cover {
+      width: 48px;
+      height: 64px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    .book-list-item__info { flex: 1; }
+    .book-list-item__title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .book-list-item__author {
+      font-size: 13px;
+      color: #888;
+    }
+    .book-list-item__day {
+      font-size: 12px;
+      color: #aaa;
+      white-space: nowrap;
+    }
+
+    .book-list-item--today {
+      border-color: var(--green);
+      background: #f0faf5;
+    }
+    .book-list-item--hidden { display: none; }
+    .book-list-item--read { opacity: .55; }
+    .book-list-item--read .book-list-item__title::after {
+      content: ' ✅';
+      font-size: 13px;
+    }
+
+    /* ── 읽기 진행률 바 ── */
+    .progress-bar {
+      max-width: 720px;
+      margin: 0 auto 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .progress-bar__label {
+      font-size: 14px;
+      font-weight: 700;
+      white-space: nowrap;
+      color: var(--text);
+    }
+    .progress-bar__track {
+      flex: 1;
+      height: 10px;
+      background: var(--border);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-bar__fill {
+      height: 100%;
+      background: var(--green);
+      border-radius: 999px;
+      transition: width .4s ease;
+    }
+    .progress-bar__count {
+      font-size: 13px;
+      color: #888;
+      white-space: nowrap;
+    }
+
+    /* ── 도서 상세 모달 ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn .2s ease-out;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal {
+      background: var(--bg);
+      border-radius: var(--radius-card);
+      max-width: 520px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 16px 48px rgba(0,0,0,.2);
+      animation: modalSlide .25s ease-out;
+    }
+    @keyframes modalSlide {
+      from { opacity: 0; transform: translateY(20px) scale(.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .modal__header {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 28px 28px 0;
+    }
+    .modal__cover {
+      width: 100px;
+      height: 136px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 44px;
+      flex-shrink: 0;
+    }
+    .modal__info { flex: 1; }
+    .modal__title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .modal__author {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 8px;
+    }
+    .modal__tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .modal__tag {
+      font-size: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 3px 10px;
+      color: #666;
+    }
+    .modal__reason {
+      padding: 20px 28px;
+      margin-top: 16px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+    .modal__reason-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .modal__reason-text {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #444;
+    }
+    .modal__actions {
+      display: flex;
+      gap: 10px;
+      padding: 20px 28px;
+      border-top: 1px solid var(--border);
+    }
+    .modal__actions .btn { flex: 1; justify-content: center; font-size: 14px; }
+    .modal__close {
+      position: absolute;
+      right: 16px;
+      top: 16px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #888;
+      transition: background .15s;
+    }
+    .modal__close:hover { background: var(--border); }
+
+    /* ── 즐겨찾기/읽음 아이콘 버튼 ── */
+    .book-list-item__actions {
+      display: flex;
+      gap: 4px;
+      margin-left: 8px;
+    }
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: all .15s;
+      padding: 0;
+      flex-shrink: 0;
+    }
+    .icon-btn:hover { background: var(--surface); }
+    .icon-btn--active { border-color: var(--yellow); background: #FFF8E1; }
+    .icon-btn--read-active { border-color: var(--green); background: #E8F5E9; }
+
+    /* ── 검색/필터 바 ── */
+    .search-bar {
+      max-width: 720px;
+      margin: 0 auto 20px;
+    }
+    .search-bar__input-wrap {
+      position: relative;
+      margin-bottom: 12px;
+    }
+    .search-bar__icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #aaa;
+      pointer-events: none;
+    }
+    .search-bar__input {
+      width: 100%;
+      padding: 12px 16px 12px 44px;
+      border: 2px solid var(--border);
+      border-radius: 999px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      outline: none;
+      transition: border-color .2s;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .search-bar__input:focus { border-color: var(--accent); }
+    .search-bar__input::placeholder { color: #bbb; }
+
+    .search-bar__controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .search-bar__label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #888;
+      margin-right: 4px;
+    }
+
+    .tag-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: #666;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .tag-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .tag-btn--active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .sort-select {
+      margin-left: auto;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      color: #666;
+      background: var(--bg);
+      cursor: pointer;
+      outline: none;
+    }
+    .sort-select:focus { border-color: var(--accent); }
+
+    .search-bar__count {
+      font-size: 13px;
+      color: #aaa;
+      margin-top: 8px;
+    }
+    .search-bar__no-result {
+      text-align: center;
+      padding: 40px 0;
+      color: #aaa;
+      font-size: 15px;
+    }
+
+    /* ── 카테고리 선택 페이지 ── */
+    .category-header {
+      text-align: center;
+      padding: 48px 0 24px;
+    }
+    .category-header__badge {
+      display: inline-block;
+      background: #F3E5F5;
+      color: var(--primary);
+      font-size: 14px;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+    .category-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 0 0 8px;
+    }
+    .category-header p {
+      font-size: 15px;
+      color: #888;
+      margin: 0;
+    }
+    .category-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+      padding-bottom: 24px;
+    }
+    .category-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 40px 24px;
+      border-radius: 16px;
+      border: 2px solid var(--border);
+      background: var(--bg);
+      cursor: pointer;
+      transition: transform .2s, box-shadow .2s, border-color .2s;
+      text-align: center;
+    }
+    .category-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 32px rgba(0,0,0,.1);
+    }
+    .category-card--lit:hover { border-color: var(--primary); }
+    .category-card--nonlit:hover { border-color: var(--accent); }
+    .category-card__emoji { font-size: 48px; line-height: 1; }
+    .category-card__label { font-size: 22px; font-weight: 700; color: var(--text); }
+    .category-card__desc { font-size: 13px; color: #888; font-weight: 500; line-height: 1.5; }
+    .category-card__count {
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+      padding: 4px 12px;
+      border-radius: 999px;
+    }
+    .category-card--lit .category-card__count { background: var(--primary); }
+    .category-card--nonlit .category-card__count { background: var(--accent); }
+    .category-all-btn {
+      display: block;
+      margin: 0 auto 40px;
+      padding: 12px 32px;
+      border-radius: 999px;
+      border: 2px solid var(--border);
+      background: var(--bg);
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .category-all-btn:hover {
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    /* ── 반응형 ── */
+    @media (max-width: 768px) {
+      .today-card__top { flex-direction: column; gap: 20px; padding: 24px; }
+      .today-card__cover { width: 100%; min-height: 140px; }
+      .today-card__reason { padding: 20px 24px; }
+      .recommend-header h1 { font-size: 24px; }
+      .hero { padding: 40px 0 24px; }
+      .hero h1 { font-size: 26px; }
+      .hero p { font-size: 15px; }
+      .header__logo { font-size: 18px; }
+      .grade-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+      .grade-card { padding: 28px 16px; }
+      .grade-card__emoji { font-size: 34px; }
+      .grade-card__label { font-size: 18px; }
+      .search-bar__controls { gap: 6px; }
+      .sort-select { margin-left: 0; margin-top: 4px; width: 100%; }
+      .category-grid { gap: 14px; }
+      .category-card { padding: 30px 16px; }
+      .category-card__emoji { font-size: 36px; }
+      .category-card__label { font-size: 18px; }
+      .category-header h1 { font-size: 24px; }
+    }
+    @media (max-width: 420px) {
+      .grade-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .grade-card { padding: 24px 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script>
+    var GRADE_COLORS = [
+      'var(--accent)', 'var(--green)', 'var(--yellow)',
+      'var(--primary)', 'var(--accent)', 'var(--green)',
+    ];
+    var GRADE_EMOJI = ['\u{1F331}', '\u{1F33F}', '\u{1F33B}', '\u{1F333}', '⭐', '\u{1F680}'];
+    var GRADE_LABELS = ['1학년', '2학년', '3학년', '4학년', '5학년', '6학년'];
+    var COVER_COLORS = [
+      '#E8D5F5','#D5EAF5','#D5F5E3','#FFF3CD','#F5D5D5','#D5F5F0',
+      '#F0E0FF','#E0F0FF','#E0FFE8','#FFECB3','#FFE0E0','#E0FFF5',
+      '#F3E5F5','#E3F2FD','#E8F5E9','#FFF8E1','#FFEBEE','#E0F7FA',
+      '#EDE7F6','#E1F5FE','#F1F8E9','#FFFDE7','#FCE4EC','#E0F2F1',
+      '#F8BBD0','#B3E5FC','#C8E6C9','#FFE082','#EF9A9A','#80CBC4'
+    ];
+    var BOOK_EMOJI = ['\u{1F4D5}','\u{1F4D7}','\u{1F4D8}','\u{1F4D9}','\u{1F4D3}','\u{1F4D4}','\u{1F4DA}','\u{1F4D6}','\u{1F4D2}','\u{1F4DD}'];
+
+    var BOOKS = {
+      1: [
+        // ── 1학년 문학 (30) ──
+        {title:'구름빵',author:'백희나',tags:['상상력','가족'],category:'문학',reason:'구름으로 빵을 만드는 상상력 넘치는 이야기. 따뜻한 가족 사랑이 담겨 있어요.'},
+        {title:'달 샤베트',author:'백희나',tags:['상상력','나눔'],category:'문학',reason:'더운 여름밤 달이 녹아 샤베트가 되는 환상적인 이야기예요.'},
+        {title:'장수탕 선녀님',author:'백희나',tags:['상상력','가족'],category:'문학',reason:'목욕탕에서 만난 할머니 선녀님과의 따뜻한 이야기예요.'},
+        {title:'이상한 엄마',author:'백희나',tags:['가족','감동'],category:'문학',reason:'아플 때 나타난 이상한 엄마의 사랑이 감동적이에요.'},
+        {title:'강아지똥',author:'권정생',tags:['생명','자연'],category:'문학',reason:'보잘것없는 것도 소중한 역할이 있다는 걸 알려주는 명작이에요.'},
+        {title:'수박 수영장',author:'안녕달',tags:['상상력','여름'],category:'문학',reason:'거대한 수박이 수영장이 되는 기발한 상상이 담겨 있어요.'},
+        {title:'팥빙수의 전설',author:'이지은',tags:['유머','상상력'],category:'문학',reason:'팥빙수를 둘러싼 재미있는 상상이 가득한 유쾌한 이야기예요.'},
+        {title:'배고픈 애벌레',author:'에릭 칼',tags:['성장','자연'],category:'문학',reason:'알에서 나비까지 성장하는 과정을 아름다운 그림으로 보여줘요.'},
+        {title:'무지개 물고기',author:'마르쿠스 피스터',tags:['나눔','우정'],category:'문학',reason:'반짝이는 비늘을 나누며 진정한 행복을 찾는 이야기예요.'},
+        {title:'돼지책',author:'앤서니 브라운',tags:['가족','역할'],category:'문학',reason:'가족 안에서 서로의 역할과 존중을 생각하게 하는 책이에요.'},
+        {title:'고릴라',author:'앤서니 브라운',tags:['가족','상상력'],category:'문학',reason:'아빠와의 관계를 고릴라 인형을 통해 따뜻하게 그린 작품이에요.'},
+        {title:'우리 엄마',author:'앤서니 브라운',tags:['가족','사랑'],category:'문학',reason:'엄마의 다양한 모습을 사랑스럽고 유머러스하게 그렸어요.'},
+        {title:'우리 아빠',author:'앤서니 브라운',tags:['가족','사랑'],category:'문학',reason:'아빠의 멋진 모습을 유쾌하게 표현한 그림책이에요.'},
+        {title:'겁쟁이 빌리',author:'앤서니 브라운',tags:['감정','극복'],category:'문학',reason:'걱정 인형에게 걱정을 맡기는 빌리의 따뜻한 이야기예요.'},
+        {title:'지각대장 존',author:'존 버닝햄',tags:['상상력','학교'],category:'문학',reason:'매일 신기한 이유로 지각하는 존의 엉뚱한 이야기예요.'},
+        {title:'검피 아저씨의 뱃놀이',author:'존 버닝햄',tags:['규칙','모험'],category:'문학',reason:'규칙을 안 지키면 어떤 일이 벌어지는지 유머러스하게 보여줘요.'},
+        {title:'프레드릭',author:'레오 리오니',tags:['예술','개성'],category:'문학',reason:'색깔과 단어를 모으는 쥐 프레드릭. 예술의 가치를 보여줘요.'},
+        {title:'으뜸 헤엄이',author:'레오 리오니',tags:['협동','용기'],category:'문학',reason:'작은 물고기들이 힘을 합쳐 큰 물고기를 이기는 이야기예요.'},
+        {title:'괴물들이 사는 나라',author:'모리스 센닥',tags:['상상력','감정'],category:'문학',reason:'맥스의 상상 속 괴물나라 모험! 칼데콧 수상작이에요.'},
+        {title:'종이 봉지 공주',author:'로버트 먼치',tags:['용기','반전'],category:'문학',reason:'용을 물리치고 왕자를 구하는 공주의 통쾌한 반전이에요.'},
+        {title:'피터의 의자',author:'에즈라 잭 키츠',tags:['성장','가족'],category:'문학',reason:'동생이 생긴 피터의 복잡한 마음을 섬세하게 그렸어요.'},
+        {title:'쏘피가 화나면 정말 정말 화나면',author:'몰리 뱅',tags:['감정','성장'],category:'문학',reason:'화가 났을 때 어떻게 하면 좋은지 알려주는 책이에요.'},
+        {title:'난 토마토 절대 안 먹어',author:'로렌 차일드',tags:['유머','식습관'],category:'문학',reason:'편식하는 아이에게 음식의 재미를 알려주는 유쾌한 그림책이에요.'},
+        {title:'곰 사냥을 떠나자',author:'마이클 로젠',tags:['모험','리듬'],category:'문학',reason:'반복되는 리듬과 의성어가 소리 내어 읽기에 딱 좋은 책이에요.'},
+        {title:'알사탕',author:'백희나',tags:['판타지','감정'],category:'문학',reason:'사탕을 먹으면 마음의 소리가 들려요! 공감 능력을 키워주는 그림책이에요.'},
+        {title:'파도야 놀자',author:'이수지',tags:['자연','상상력'],category:'문학',reason:'글 없이 그림만으로 바다와 노는 즐거움을 표현한 아름다운 그림책이에요.'},
+        {title:'거짓말 같은 이야기',author:'강경수',tags:['유머','상상력'],category:'문학',reason:'거짓말처럼 재미있는 이야기가 꼬리에 꼬리를 무는 유쾌한 그림책이에요.'},
+        {title:'이게 정말 사과일까',author:'요시타케 신스케',tags:['호기심','상상력'],category:'문학',reason:'사과 하나로 시작되는 끝없는 상상! 생각하는 힘을 키워줘요.'},
+        {title:'할머니의 여름휴가',author:'안녕달',tags:['가족','여름'],category:'문학',reason:'할머니와 함께하는 특별한 여름 이야기. 따뜻한 가족 사랑이 느껴져요.'},
+        {title:'이파라파냐무나무',author:'이지은',tags:['상상력','모험'],category:'문학',reason:'신기한 나무에서 벌어지는 상상력 넘치는 모험 이야기예요.'},
+        // ── 1학년 비문학 (30) ──
+        {title:'WHY? 우리 몸',author:'예림당',tags:['인체','과학'],category:'비문학',comic:true,reason:'우리 몸의 신비를 만화로 쉽고 재미있게 알려줘요.'},
+        {title:'WHY? 동물',author:'예림당',tags:['동물','자연'],category:'비문학',comic:true,reason:'다양한 동물들의 생태를 만화로 재미있게 배워요.'},
+        {title:'WHY? 곤충',author:'예림당',tags:['곤충','자연'],category:'비문학',comic:true,reason:'신기한 곤충 세계를 만화로 탐험해요.'},
+        {title:'WHY? 공룡',author:'예림당',tags:['공룡','과학'],category:'비문학',comic:true,reason:'공룡의 세계를 만화로 생생하게 만나볼 수 있어요.'},
+        {title:'WHY? 날씨',author:'예림당',tags:['날씨','과학'],category:'비문학',comic:true,reason:'비, 눈, 바람이 왜 생기는지 만화로 쉽게 알려줘요.'},
+        {title:'WHY? 바다',author:'예림당',tags:['바다','자연'],category:'비문학',comic:true,reason:'넓고 깊은 바다의 비밀을 만화로 탐험해요.'},
+        {title:'WHY? 식물',author:'예림당',tags:['식물','자연'],category:'비문학',comic:true,reason:'식물이 자라는 신기한 과정을 만화로 배워요.'},
+        {title:'WHY? 우주',author:'예림당',tags:['우주','과학'],category:'비문학',comic:true,reason:'광활한 우주의 비밀을 만화로 쉽게 알려줘요.'},
+        {title:'신기한 스쿨버스: 인체 속으로',author:'조애너 콜',tags:['인체','과학'],category:'비문학',comic:true,reason:'프리즐 선생님과 함께 몸속을 탐험하는 과학 모험이에요.'},
+        {title:'신기한 스쿨버스: 태양계 탐험',author:'조애너 콜',tags:['우주','과학'],category:'비문학',comic:true,reason:'스쿨버스를 타고 태양계를 여행하며 행성을 배워요.'},
+        {title:'신기한 스쿨버스: 바다 탐험',author:'조애너 콜',tags:['바다','과학'],category:'비문학',comic:true,reason:'바다 속 신기한 생물들을 직접 만나는 과학 모험이에요.'},
+        {title:'신기한 스쿨버스: 지구 속으로',author:'조애너 콜',tags:['지구','과학'],category:'비문학',comic:true,reason:'땅속 깊이 들어가 지구의 구조를 배우는 모험이에요.'},
+        {title:'세밀화로 그린 보리 어린이 식물 도감',author:'보리 편집부',tags:['식물','도감'],category:'비문학',reason:'우리 주변 식물을 세밀화로 관찰하고 배우는 도감이에요.'},
+        {title:'세밀화로 그린 보리 어린이 동물 도감',author:'보리 편집부',tags:['동물','도감'],category:'비문학',reason:'우리나라 동물을 세밀화로 자세히 관찰할 수 있는 도감이에요.'},
+        {title:'세밀화로 그린 보리 어린이 곤충 도감',author:'보리 편집부',tags:['곤충','도감'],category:'비문학',reason:'주변에서 볼 수 있는 곤충을 세밀화로 배우는 도감이에요.'},
+        {title:'똒똒한 한글왕',author:'기탄교육',tags:['한글','학습'],category:'비문학',reason:'한글의 원리를 재미있는 이야기로 쉽게 배울 수 있어요.'},
+        {title:'1학년이 꼭 알아야 할 교과서 속 과학',author:'아이세움',tags:['과학','교과서'],category:'비문학',reason:'1학년 교과서에 나오는 과학 개념을 쉽게 풀어줘요.'},
+        {title:'누가 내 머리에 똥 쌌어?',author:'베르너 홀츠바르트',tags:['동물','관찰'],category:'비문학',reason:'동물마다 다른 똥 모양을 재미있게 알려주는 관찰 그림책이에요.'},
+        {title:'나의 첫 국어사전',author:'낱말공장',tags:['국어','학습'],category:'비문학',reason:'처음 국어사전을 접하는 1학년을 위한 쉬운 사전이에요.'},
+        {title:'지구가 100명의 마을이라면',author:'데이비드 스미스',tags:['세계','사회'],category:'비문학',reason:'세계를 100명 마을로 줄여서 쉽게 이해하게 해줘요.'},
+        {title:'이가 빠지면 지붕 위로 던져요',author:'셀비 빌러',tags:['문화','세계'],category:'비문학',reason:'세계 여러 나라의 이 빠진 풍습을 재미있게 비교해요.'},
+        {title:'옛날 사람들은 어떻게 살았을까',author:'유다정',tags:['역사','생활'],category:'비문학',reason:'옛날 사람들의 생활을 그림으로 쉽게 알려줘요.'},
+        {title:'내 몸 사용 설명서',author:'시마다 쓰나미',tags:['인체','건강'],category:'비문학',reason:'우리 몸의 다양한 기능을 쉽고 재미있게 알려줘요.'},
+        {title:'교통 안전 그림책',author:'한림출판사',tags:['안전','생활'],category:'비문학',reason:'교통 안전 규칙을 그림과 함께 쉽게 배울 수 있어요.'},
+        {title:'사계절 자연 놀이',author:'봉현선',tags:['자연','놀이'],category:'비문학',reason:'계절마다 자연에서 할 수 있는 놀이를 소개해줘요.'},
+        {title:'왜 물은 높은 곳에서 낮은 곳으로 흐를까',author:'정창훈',tags:['과학','자연'],category:'비문학',reason:'일상 속 과학 궁금증을 쉽게 풀어주는 과학 그림책이에요.'},
+        {title:'소중한 나의 몸',author:'유문조',tags:['인체','성교육'],category:'비문학',reason:'나의 몸이 얼마나 소중한지 올바르게 알려주는 책이에요.'},
+        {title:'숫자 세기 1부터 100까지',author:'김충원',tags:['수학','숫자'],category:'비문학',reason:'숫자의 개념을 놀이처럼 재미있게 익힐 수 있어요.'},
+        {title:'다 콩이야',author:'마쓰오카 교코',tags:['식물','음식'],category:'비문학',reason:'콩이 변신하는 다양한 음식을 알려주는 과학 그림책이에요.'},
+        {title:'여러 나라의 인사법',author:'박은정',tags:['문화','세계'],category:'비문학',reason:'세계 여러 나라의 다양한 인사법을 재미있게 배워요.'}
+      ],
+      2: [
+        // ── 2학년 문학 (30) ──
+        {title:'마당을 나온 암탉',author:'황선미',tags:['모험','사랑'],category:'문학',reason:'자유를 꿈꾸는 암탉 잎싹의 감동적인 모험이에요.'},
+        {title:'아낌없이 주는 나무',author:'쉘 실버스타인',tags:['사랑','나눔'],category:'문학',reason:'나무와 소년의 관계를 통해 사랑의 의미를 생각하게 해요.'},
+        {title:'멋진 여우 씨',author:'로알드 달',tags:['지혜','모험'],category:'문학',reason:'세 농부에 맞서는 여우 가족의 통쾌한 이야기예요.'},
+        {title:'100층짜리 집',author:'이와이 도시오',tags:['탐험','숫자'],category:'문학',reason:'100층까지 올라가며 다양한 동물의 집을 구경해요.'},
+        {title:'못된 녀석들',author:'애런 블래이비',tags:['유머','반전'],category:'문학',reason:'나쁜 동물들이 좋은 일을 하려고 노력하는 유쾌한 이야기예요.'},
+        {title:'엄마 마중',author:'이태준',tags:['가족','기다림'],category:'문학',reason:'엄마를 기다리는 아이의 마음을 섬세하게 그린 한국 명작이에요.'},
+        {title:'돼지 왕자',author:'박연철',tags:['변신','사랑'],category:'문학',reason:'겉모습이 아닌 마음이 중요하다는 메시지를 전해요.'},
+        {title:'윌리와 휴',author:'앤서니 브라운',tags:['우정','다양성'],category:'문학',reason:'서로 다른 두 친구의 특별한 우정 이야기예요.'},
+        {title:'나쁜 어린이 표',author:'황선미',tags:['학교','성장'],category:'문학',reason:'2학년 또래의 학교생활 고민과 성장을 따뜻하게 그렸어요.'},
+        {title:'용기를 내, 비닐장갑!',author:'유설화',tags:['용기','자존감'],category:'문학',reason:'쓸모없다 여겨진 비닐장갑이 용기를 내는 이야기예요.'},
+        {title:'사소한 소원만 들어주는 두꺼비',author:'은이결',tags:['판타지','소원'],category:'문학',reason:'진짜 소중한 것이 무엇인지 깨닫게 해주는 이야기예요.'},
+        {title:'나는 강물처럼 말해요',author:'조던 스콧',tags:['자존감','극복'],category:'문학',reason:'말더듬이 소년이 자기만의 방식으로 세상과 소통해요.'},
+        {title:'책 먹는 여우',author:'프란치스카 비어만',tags:['독서','유머'],category:'문학',reason:'책을 읽는 것을 넘어 먹어버리는 여우의 유쾌한 이야기예요.'},
+        {title:'고구마구마',author:'사이다',tags:['유머','말놀이'],category:'문학',reason:'고구마를 좋아하는 아이의 말장난 가득한 재미있는 이야기예요.'},
+        {title:'깊은 밤 부엌에서',author:'모리스 센닥',tags:['모험','상상력'],category:'문학',reason:'한밤중 부엌에서 벌어지는 환상적인 모험 이야기예요.'},
+        {title:'까막나라에서 온 삽살개',author:'권정생',tags:['우정','성장'],category:'문학',reason:'삽살개와 아이의 특별한 우정을 그린 권정생의 동화예요.'},
+        {title:'꽃을 선물할게',author:'강경수',tags:['우정','선물'],category:'문학',reason:'친구에게 꽃을 선물하려는 곰의 따뜻한 마음이 담겨 있어요.'},
+        {title:'돌아온 못된 녀석들',author:'애런 블래이비',tags:['유머','우정'],category:'문학',reason:'못된 녀석들의 좌충우돌 영웅 도전이 계속돼요.'},
+        {title:'치과 의사 드소토 선생님',author:'윌리엄 스타이그',tags:['지혜','직업'],category:'문학',reason:'작은 쥐 치과의사의 지혜로운 문제 해결이 통쾌해요.'},
+        {title:'심술꾸러기 산타',author:'레이먼드 브릭스',tags:['유머','크리스마스'],category:'문학',reason:'투덜대면서도 선물을 나르는 산타의 유쾌한 하루예요.'},
+        {title:'제비를 그리는 아이',author:'이수지',tags:['예술','자유'],category:'문학',reason:'그림 그리는 즐거움과 상상력을 아름답게 표현한 그림책이에요.'},
+        {title:'어디에서 왔니?',author:'정진호',tags:['탄생','가족'],category:'문학',reason:'아이가 어디에서 왔는지 상상력 넘치게 풀어낸 그림책이에요.'},
+        {title:'지하 100층짜리 집',author:'이와이 도시오',tags:['탐험','자연'],category:'문학',reason:'땅속 100층까지 내려가며 다양한 동물의 집을 구경해요.'},
+        {title:'바다 100층짜리 집',author:'이와이 도시오',tags:['탐험','바다'],category:'문학',reason:'바다 속 100층까지 내려가며 신비한 해양 생물을 만나요.'},
+        {title:'이유가 있어요',author:'요시타케 신스케',tags:['유머','습관'],category:'문학',reason:'코 파기, 다리 떨기... 나쁜 습관에도 다 이유가 있대요!'},
+        {title:'고양이 해결사 깜냥',author:'홍민정',tags:['모험','추리'],category:'문학',reason:'고양이 깜냥이 동네 사건을 해결하는 유쾌한 모험이에요.'},
+        {title:'조지의 놀라운 약',author:'로알드 달',tags:['유머','모험'],category:'문학',reason:'조지가 만든 기상천외한 약! 로알드 달의 유머가 넘쳐요.'},
+        {title:'그루팔로',author:'줄리아 도널드슨',tags:['유머','지혜'],category:'문학',reason:'꾀 많은 생쥐가 무서운 그루팔로를 만나는 유쾌한 이야기예요.'},
+        {title:'당근 유치원',author:'안녕달',tags:['학교','일상'],category:'문학',reason:'당근 유치원에서 벌어지는 즐겁고 따뜻한 일상 이야기예요.'},
+        {title:'여름이 온다',author:'이수지',tags:['자연','계절'],category:'문학',reason:'여름이 오는 모습을 아름다운 그림으로 표현한 칼데콧 수상작이에요.'},
+        // ── 2학년 비문학 (30) ──
+        {title:'WHY? 지구',author:'예림당',tags:['지구','과학'],category:'비문학',comic:true,reason:'우리가 사는 지구의 비밀을 만화로 재미있게 알려줘요.'},
+        {title:'WHY? 발명·발견',author:'예림당',tags:['발명','과학'],category:'비문학',comic:true,reason:'세상을 바꾼 위대한 발명과 발견을 만화로 배워요.'},
+        {title:'WHY? 화산',author:'예림당',tags:['화산','자연'],category:'비문학',comic:true,reason:'화산은 왜 폭발할까? 만화로 쉽게 알려줘요.'},
+        {title:'WHY? 로봇',author:'예림당',tags:['로봇','기술'],category:'비문학',comic:true,reason:'로봇의 원리와 미래를 만화로 재미있게 배워요.'},
+        {title:'WHY? 환경',author:'예림당',tags:['환경','자연'],category:'비문학',comic:true,reason:'환경을 지키는 방법을 만화로 쉽게 알려줘요.'},
+        {title:'WHY? 물',author:'예림당',tags:['물','과학'],category:'비문학',comic:true,reason:'물의 신기한 성질과 순환을 만화로 배워요.'},
+        {title:'신기한 스쿨버스: 전기 나라',author:'조애너 콜',tags:['전기','과학'],category:'비문학',comic:true,reason:'전기의 원리를 스쿨버스 모험으로 재미있게 배워요.'},
+        {title:'신기한 스쿨버스: 허리케인',author:'조애너 콜',tags:['날씨','과학'],category:'비문학',comic:true,reason:'폭풍 속으로 들어가 날씨의 원리를 배우는 모험이에요.'},
+        {title:'마법천자문 1권',author:'시리얼',tags:['한자','학습'],category:'비문학',comic:true,reason:'마법 이야기와 함께 한자를 재미있게 익힐 수 있어요.'},
+        {title:'마법천자문 2권',author:'시리얼',tags:['한자','학습'],category:'비문학',comic:true,reason:'모험을 하며 한자의 뜻과 모양을 자연스럽게 배워요.'},
+        {title:'으뜸 헤엄이의 바다 동물 관찰기',author:'레오 리오니',tags:['바다','동물'],category:'비문학',reason:'바다 생물의 다양한 모습을 아름다운 그림으로 관찰해요.'},
+        {title:'지구를 숨 쉬게 하는 다섯 가지 방법',author:'한국환경교육학회',tags:['환경','실천'],category:'비문학',reason:'환경을 위해 매일 할 수 있는 쉬운 실천법을 알려줘요.'},
+        {title:'나는야 화폐 왕',author:'박은정',tags:['경제','돈'],category:'비문학',reason:'화폐의 역사와 돈의 가치를 재미있게 배워요.'},
+        {title:'세계 음식 여행',author:'김인혜',tags:['문화','음식'],category:'비문학',reason:'세계 여러 나라의 음식과 식문화를 알려줘요.'},
+        {title:'내가 처음 가본 박물관',author:'국립중앙박물관',tags:['역사','문화'],category:'비문학',reason:'박물관에서 만나는 우리나라 역사와 문화를 소개해요.'},
+        {title:'안전 대장이 될래요',author:'한국어린이안전재단',tags:['안전','생활'],category:'비문학',reason:'일상에서 꼭 알아야 할 안전 수칙을 알려줘요.'},
+        {title:'달팽이 과학동화: 물은 어디로 갈까',author:'웅진씽크빅',tags:['과학','자연'],category:'비문학',reason:'물의 순환 과정을 이야기로 쉽게 풀어줘요.'},
+        {title:'1·2학년이 꼭 읽어야 할 교과서 전래동화',author:'기탄교육',tags:['전래','교과서'],category:'비문학',reason:'교과서에 나오는 전래동화의 교훈을 정리해줘요.'},
+        {title:'나의 첫 한국사',author:'이광희',tags:['역사','한국사'],category:'비문학',reason:'우리나라 역사를 쉬운 이야기로 처음 만나볼 수 있어요.'},
+        {title:'직업이 뭐예요?',author:'박신식',tags:['직업','사회'],category:'비문학',reason:'다양한 직업의 세계를 그림과 함께 쉽게 알려줘요.'},
+        {title:'빛이 만드는 세계',author:'정창훈',tags:['빛','과학'],category:'비문학',reason:'빛의 성질과 역할을 쉬운 실험으로 배울 수 있어요.'},
+        {title:'우리 동네 자연 관찰',author:'봉현선',tags:['자연','관찰'],category:'비문학',reason:'동네에서 만날 수 있는 동식물을 관찰하는 방법을 알려줘요.'},
+        {title:'재미있는 수학 여행',author:'김용운',tags:['수학','논리'],category:'비문학',reason:'숫자와 도형의 재미를 놀이처럼 알려주는 수학 입문서예요.'},
+        {title:'우리 몸의 구멍',author:'허은미',tags:['인체','과학'],category:'비문학',reason:'눈, 코, 입, 귀 등 몸의 구멍이 하는 역할을 알려줘요.'},
+        {title:'거미줄은 왜 끈적끈적할까',author:'정창훈',tags:['곤충','과학'],category:'비문학',reason:'곤충의 신기한 비밀을 과학적으로 풀어주는 책이에요.'},
+        {title:'여기는 맛있는 농장이야',author:'한태희',tags:['농업','음식'],category:'비문학',reason:'우리가 먹는 음식이 어디에서 오는지 알려주는 그림책이에요.'},
+        {title:'세상에서 가장 큰 동물 도감',author:'톰 잭슨',tags:['동물','비교'],category:'비문학',reason:'세상에서 가장 큰 동물들을 실제 크기로 비교해봐요.'},
+        {title:'아이들의 권리를 선언합니다',author:'안미란',tags:['권리','사회'],category:'비문학',reason:'어린이가 가진 소중한 권리를 쉽고 재미있게 알려줘요.'},
+        {title:'한글을 만든 세종대왕',author:'한국위인전편집부',tags:['인물','역사'],category:'비문학',reason:'한글을 만든 세종대왕의 이야기를 쉽게 알려줘요.'},
+        {title:'내 친구 지구',author:'패트리샤 매클라클란',tags:['지구','환경'],category:'비문학',reason:'지구를 아끼고 사랑하는 마음을 키워주는 그림책이에요.'}
+      ],
+      3: [
+        // ── 3학년 문학 (30) ──
+        {title:'찰리와 초콜릿 공장',author:'로알드 달',tags:['모험','판타지'],category:'문학',reason:'윌리 웡카의 신비한 초콜릿 공장 탐험! 착한 마음이 보상받아요.'},
+        {title:'마법의 시간여행 1: 공룡 시대로',author:'메리 폽 오스본',tags:['모험','역사'],category:'문학',reason:'나무 위 오두막에서 시간여행을 떠나는 남매의 모험이에요.'},
+        {title:'마법의 시간여행 2: 중세의 성',author:'메리 폽 오스본',tags:['모험','역사'],category:'문학',reason:'중세 시대 성으로 시간여행을 떠나는 두 번째 모험이에요.'},
+        {title:'행복한 청소부',author:'모니카 페트',tags:['행복','직업'],category:'문학',reason:'청소부 아저씨가 예술을 통해 행복을 찾는 이야기예요.'},
+        {title:'우주 호텔',author:'로알드 달',tags:['SF','상상력'],category:'문학',reason:'찰리가 우주 호텔에서 겪는 기상천외한 모험이에요.'},
+        {title:'꽃들에게 희망을',author:'트리나 폴러스',tags:['희망','성장'],category:'문학',reason:'애벌레가 나비가 되는 과정을 통해 희망의 메시지를 전해요.'},
+        {title:'바람이 멈출 때',author:'샬로트 졸로토',tags:['자연','순환'],category:'문학',reason:'끝이 아닌 새로운 시작이 있다는 깨달음을 주는 아름다운 책이에요.'},
+        {title:'마지막 거인',author:'프랑수아 플라스',tags:['모험','다양성'],category:'문학',reason:'마지막 남은 거인을 발견한 소년의 감동적인 이야기예요.'},
+        {title:'점',author:'피터 레이놀즈',tags:['자신감','예술'],category:'문학',reason:'작은 점 하나로 시작하는 예술의 세계! 누구나 창의적일 수 있어요.'},
+        {title:'나의 린드그렌 선생님',author:'유은실',tags:['성장','학교'],category:'문학',reason:'선생님과 제자 사이의 따뜻한 성장 이야기예요.'},
+        {title:'세상에서 가장 힘센 수탉',author:'이호백',tags:['지혜','우화'],category:'문학',reason:'힘이 아닌 지혜로 문제를 해결하는 수탉의 이야기예요.'},
+        {title:'해리의 꽃무늬 옷',author:'진 지온',tags:['개성','자아'],category:'문학',reason:'자기 모습을 찾아가는 강아지 해리의 이야기예요.'},
+        {title:'제임스와 슈퍼 복숭아',author:'로알드 달',tags:['모험','판타지'],category:'문학',reason:'거대한 복숭아 속 곤충 친구들과의 환상적인 모험이에요.'},
+        {title:'이사 도중에 만난 사람들',author:'유형진',tags:['일상','가치'],category:'문학',reason:'진짜 소중한 것이 무엇인지 고민하게 하는 따뜻한 이야기예요.'},
+        {title:'달려라 달려',author:'김혜원',tags:['성장','도전'],category:'문학',reason:'포기하지 않고 달리는 아이의 도전과 성장 이야기예요.'},
+        {title:'BFG: 거인 아저씨',author:'로알드 달',tags:['판타지','우정'],category:'문학',reason:'착한 거인과 소녀 소피의 특별한 우정과 모험이에요.'},
+        {title:'마녀 위니',author:'밸러리 토머스',tags:['판타지','유머'],category:'문학',reason:'마녀 위니와 고양이 윌버의 유쾌한 마법 소동이에요.'},
+        {title:'마녀들',author:'로알드 달',tags:['판타지','용기'],category:'문학',reason:'진짜 마녀를 만난 소년의 스릴 넘치는 모험! 용기를 배워요.'},
+        {title:'대니 세상의 챔피언',author:'로알드 달',tags:['가족','모험'],category:'문학',reason:'아빠와 아들의 특별한 모험! 가족의 사랑을 느껴요.'},
+        {title:'로봇의 별',author:'이현',tags:['SF','우정'],category:'문학',reason:'로봇과 인간의 우정을 그린 따뜻한 한국 SF 동화예요.'},
+        {title:'푸른 사자 와니니',author:'이현',tags:['성장','용기'],category:'문학',reason:'들판에 홀로 남겨진 아기 사자의 성장과 용기의 이야기예요.'},
+        {title:'방과 후 초능력 클럽',author:'김리리',tags:['판타지','학교'],category:'문학',reason:'방과 후에 초능력이 생긴 아이들의 유쾌한 모험이에요.'},
+        {title:'내가 라면을 먹을 때',author:'하세가와 요시후미',tags:['세계','공감'],category:'문학',reason:'내가 라면을 먹을 때 세계 다른 곳의 아이들은 뭘 하고 있을까?'},
+        {title:'캡틴 언더팬츠 1',author:'데이브 필키',tags:['유머','모험'],category:'문학',comic:true,reason:'두 소년이 만든 만화 속 영웅이 진짜가 되는 웃음 폭발 모험이에요.'},
+        {title:'윔피키드 1: 별난 놈의 일기',author:'제프 키니',tags:['학교','유머'],category:'문학',comic:true,reason:'평범한 학생 그레그의 좌충우돌 학교생활 일기예요.'},
+        {title:'이상한 과자 가게 전천당 1',author:'히로시마 레이코',tags:['판타지','선택'],category:'문학',reason:'신비한 과자 가게에서 파는 마법 과자들! 선택에 따라 결과가 달라져요.'},
+        {title:'이상한 과자 가게 전천당 2',author:'히로시마 레이코',tags:['판타지','교훈'],category:'문학',reason:'전천당의 신비한 과자들! 욕심을 부리면 어떤 결과가 올까요?'},
+        {title:'수상한 학원',author:'박현숙',tags:['미스터리','학교'],category:'문학',reason:'수상한 학원에서 벌어지는 미스터리를 풀어가는 이야기예요.'},
+        {title:'벗지 못하는 아이',author:'요시타케 신스케',tags:['유머','일상'],category:'문학',reason:'옷이 벗겨지지 않는 아이의 기발한 상상이 웃음을 줘요.'},
+        {title:'내 모자 어디 갔을까',author:'존 클라센',tags:['유머','추리'],category:'문학',reason:'모자를 잃어버린 곰의 유쾌한 추적기! 반전이 재미있어요.'},
+        // ── 3학년 비문학 (30) ──
+        {title:'WHY? 빛과 소리',author:'예림당',tags:['물리','과학'],category:'비문학',comic:true,reason:'빛과 소리의 원리를 만화로 쉽게 알려줘요.'},
+        {title:'WHY? 미생물',author:'예림당',tags:['생물','과학'],category:'비문학',comic:true,reason:'눈에 보이지 않는 미생물의 세계를 만화로 탐험해요.'},
+        {title:'WHY? 에너지',author:'예림당',tags:['에너지','과학'],category:'비문학',comic:true,reason:'에너지란 무엇이고 왜 중요한지 만화로 배워요.'},
+        {title:'WHY? 전기·전자',author:'예림당',tags:['전기','기술'],category:'비문학',comic:true,reason:'전기와 전자의 원리를 만화로 재미있게 알려줘요.'},
+        {title:'살아남기 시리즈: 무인도에서 살아남기',author:'코믹컴',tags:['생존','자연'],category:'비문학',comic:true,reason:'무인도에서 살아남는 방법과 과학 지식을 배워요.'},
+        {title:'살아남기 시리즈: 사막에서 살아남기',author:'코믹컴',tags:['생존','자연'],category:'비문학',comic:true,reason:'사막 환경의 특징과 생존 과학을 재미있게 알려줘요.'},
+        {title:'살아남기 시리즈: 빙하에서 살아남기',author:'코믹컴',tags:['생존','자연'],category:'비문학',comic:true,reason:'빙하 지대의 과학과 생존법을 만화로 배워요.'},
+        {title:'과학실험왕 1: 산과 염기',author:'스토리 a.',tags:['실험','과학'],category:'비문학',comic:true,reason:'산과 염기 실험을 통해 화학의 기초를 만화로 배워요.'},
+        {title:'과학실험왕 2: 지구의 역사',author:'스토리 a.',tags:['지구','과학'],category:'비문학',comic:true,reason:'지구가 어떻게 만들어졌는지 실험과 만화로 배워요.'},
+        {title:'설민석의 한국사 대모험 1',author:'설민석',tags:['한국사','역사'],category:'비문학',comic:true,reason:'한국사를 재미있는 만화 모험으로 배울 수 있어요.'},
+        {title:'설민석의 한국사 대모험 2',author:'설민석',tags:['한국사','역사'],category:'비문학',comic:true,reason:'고조선부터 삼국시대까지 만화로 신나게 배워요.'},
+        {title:'파브르 곤충기',author:'장 앙리 파브르',tags:['곤충','관찰'],category:'비문학',reason:'곤충의 신비로운 세계를 생생하게 그린 과학 고전이에요.'},
+        {title:'지구를 살리는 10가지 습관',author:'이한음',tags:['환경','실천'],category:'비문학',reason:'환경을 위해 일상에서 실천할 수 있는 방법을 알려줘요.'},
+        {title:'투발루에게 수영을 가르칠 걸 그랬어',author:'유다정',tags:['환경','기후'],category:'비문학',reason:'기후 변화로 사라져가는 나라 이야기로 환경 문제를 생각해요.'},
+        {title:'어린이를 위한 한국의 역사 1',author:'이이화',tags:['한국사','역사'],category:'비문학',reason:'한국 역사를 이야기처럼 쉽고 재미있게 풀어줘요.'},
+        {title:'수학도둑 1',author:'송도수',tags:['수학','논리'],category:'비문학',comic:true,reason:'수학 개념을 도둑 이야기와 함께 만화로 재미있게 배워요.'},
+        {title:'수학도둑 2',author:'송도수',tags:['수학','논리'],category:'비문학',comic:true,reason:'도형과 측정을 만화 모험으로 재미있게 풀어줘요.'},
+        {title:'이순신을 만든 글자, 한글',author:'정해왕',tags:['인물','역사'],category:'비문학',reason:'이순신 장군의 이야기를 통해 한국 역사를 쉽게 배워요.'},
+        {title:'삼국유사 어린이판',author:'일연 원작',tags:['역사','신화'],category:'비문학',reason:'단군 신화부터 다양한 옛이야기를 만나볼 수 있어요.'},
+        {title:'별자리를 찾아서',author:'한국천문연구원',tags:['우주','관찰'],category:'비문학',reason:'밤하늘의 별자리를 찾고 우주 이야기를 들어봐요.'},
+        {title:'우리나라 지도 여행',author:'이광표',tags:['지리','한국'],category:'비문학',reason:'지도를 보며 우리나라 곳곳을 여행하듯 배워요.'},
+        {title:'처음 만나는 경제 이야기',author:'이재영',tags:['경제','사회'],category:'비문학',reason:'돈, 시장, 경제의 기본 개념을 쉬운 이야기로 알려줘요.'},
+        {title:'음식의 비밀: 맛있는 과학',author:'정창훈',tags:['음식','과학'],category:'비문학',reason:'우리가 먹는 음식 속에 숨겨진 과학 원리를 알려줘요.'},
+        {title:'어린이를 위한 논어',author:'공자 원작',tags:['철학','인성'],category:'비문학',reason:'공자의 가르침을 어린이 눈높이로 쉽게 풀어줘요.'},
+        {title:'전통 놀이 백과',author:'전통놀이보존회',tags:['전통','놀이'],category:'비문학',reason:'우리나라 전통 놀이를 배우고 직접 해볼 수 있어요.'},
+        {title:'소중한 우리 문화재',author:'한국문화재재단',tags:['문화재','역사'],category:'비문학',reason:'우리나라의 소중한 문화재를 쉽게 알려주는 책이에요.'},
+        {title:'내일은 발명왕 1',author:'곰돌이 co.',tags:['발명','과학'],category:'비문학',comic:true,reason:'발명의 원리와 과정을 만화로 재미있게 배워요.'},
+        {title:'감기에 대한 모든 것',author:'닥터 사이언스',tags:['건강','인체'],category:'비문학',reason:'감기는 왜 걸리고 어떻게 나을까? 건강 상식을 알려줘요.'},
+        {title:'자연은 우리 선생님',author:'봉현선',tags:['자연','생태'],category:'비문학',reason:'자연에서 배우는 지혜와 과학을 쉽게 풀어줘요.'},
+        {title:'3학년을 위한 교과서 속 과학 실험',author:'아이세움',tags:['실험','과학'],category:'비문학',reason:'교과서에 나오는 과학 실험을 직접 해볼 수 있어요.'}
+      ],
+      4: [
+        // ── 4학년 문학 (30) ──
+        {title:'나니아 연대기: 사자, 마녀, 옷장',author:'C.S. 루이스',tags:['판타지','모험'],category:'문학',reason:'옷장 너머 마법의 나라 나니아! 선과 악의 대결이 펼쳐져요.'},
+        {title:'호빗',author:'J.R.R. 톨킨',tags:['판타지','모험'],category:'문학',reason:'평범한 호빗이 위대한 모험을 떠나는 판타지 명작이에요.'},
+        {title:'별을 헤아리며',author:'로이스 로리',tags:['역사','용기'],category:'문학',reason:'유대인 친구를 구하려는 소녀의 용기 있는 이야기. 뉴베리 수상작이에요.'},
+        {title:'마틸다',author:'로알드 달',tags:['천재','유머'],category:'문학',reason:'책을 사랑하는 천재 소녀 마틸다의 통쾌한 이야기예요.'},
+        {title:'긴긴밤',author:'루리',tags:['우정','생명'],category:'문학',reason:'코끼리와 소년의 긴 밤. 생명의 존엄성과 연대를 느껴요.'},
+        {title:'시간을 파는 상점',author:'김선영',tags:['판타지','시간'],category:'문학',reason:'시간의 소중함을 판타지로 풀어낸 한국 창작동화예요.'},
+        {title:'수상한 아파트',author:'홍민정',tags:['미스터리','추리'],category:'문학',reason:'아파트에서 벌어지는 수상한 사건을 풀어가는 추리 이야기예요.'},
+        {title:'빈 화분',author:'데미',tags:['정직','용기'],category:'문학',reason:'빈 화분을 들고 간 소년이 왕이 되는 이야기. 정직의 가치를 배워요.'},
+        {title:'우리들의 일그러진 영웅',author:'이문열',tags:['학교','권력'],category:'문학',reason:'교실 안 권력 관계를 통해 사회를 이해하게 돼요.'},
+        {title:'독수리 오형제',author:'이현',tags:['모험','형제'],category:'문학',reason:'다섯 형제가 각자의 재능으로 협동하는 통쾌한 모험이에요.'},
+        {title:'비가 오면',author:'이적',tags:['시','감성'],category:'문학',reason:'비 오는 날의 감정을 아름다운 언어로 표현한 시 그림책이에요.'},
+        {title:'물구나무서서 본 세상',author:'신현림',tags:['시','관점'],category:'문학',reason:'세상을 다른 각도에서 바라보는 재미있는 시 모음이에요.'},
+        {title:'선생님 바보 의사 선생님',author:'이은하',tags:['인물','헌신'],category:'문학',reason:'장기려 박사의 헌신적인 삶을 그린 감동적인 이야기예요.'},
+        {title:'책 도둑',author:'마르쿠스 주삭',tags:['전쟁','독서'],category:'문학',reason:'전쟁 중에도 책을 사랑한 소녀의 이야기. 책의 힘을 느껴요.'},
+        {title:'아이스크림 가게 앞에서',author:'박현숙',tags:['학교','우정'],category:'문학',reason:'4학년 또래의 학교생활과 우정을 현실감 있게 그렸어요.'},
+        {title:'몽실 언니',author:'권정생',tags:['가족','전쟁'],category:'문학',reason:'전쟁 속에서도 동생을 지키려는 몽실 언니의 감동적인 이야기예요.'},
+        {title:'마법의 시간여행 3: 해적왕의 비밀',author:'메리 폽 오스본',tags:['모험','해적'],category:'문학',reason:'해적 시대로 시간여행을 떠나 보물을 찾는 모험이에요.'},
+        {title:'말괄량이 기관차 치치',author:'버지니아 리 버튼',tags:['모험','성장'],category:'문학',reason:'작은 기관차가 큰 기관차처럼 달리고 싶어하는 이야기예요.'},
+        {title:'비밀 일기장',author:'박효미',tags:['학교','성장'],category:'문학',reason:'4학년의 비밀스러운 고민과 성장을 일기 형식으로 풀어냈어요.'},
+        {title:'마법사의 조카',author:'C.S. 루이스',tags:['판타지','창조'],category:'문학',reason:'나니아 세계가 처음 만들어지는 이야기. 나니아 연대기의 시작이에요.'},
+        {title:'내 친구 어디 있니',author:'김향이',tags:['우정','학교'],category:'문학',reason:'전학 온 친구와의 우정을 그린 따뜻한 학교 이야기예요.'},
+        {title:'이상한 과자 가게 전천당 3',author:'히로시마 레이코',tags:['판타지','선택'],category:'문학',reason:'전천당의 새로운 마법 과자들! 소원을 이루는 건 쉽지 않아요.'},
+        {title:'끝없는 이야기',author:'미하엘 엔데',tags:['판타지','상상력'],category:'문학',reason:'책 속 세계 판타지엔으로 빠져드는 대서사시! 상상력의 힘을 느껴요.'},
+        {title:'하울의 움직이는 성',author:'다이애나 윈 존스',tags:['판타지','마법'],category:'문학',reason:'마법사 하울의 움직이는 성에서 벌어지는 마법 가득한 모험이에요.'},
+        {title:'고양이 해결사 깜냥 2',author:'홍민정',tags:['모험','추리'],category:'문학',reason:'깜냥의 새로운 사건! 이번에는 더 큰 미스터리가 기다려요.'},
+        {title:'스파이더위크 가문의 비밀',author:'토니 디테를리지',tags:['판타지','모험'],category:'문학',reason:'요정 도감을 발견한 남매의 신비로운 판타지 모험이에요.'},
+        {title:'테라비시아로 가는 다리',author:'캐서린 패터슨',tags:['우정','상상력'],category:'문학',reason:'둘만의 비밀 왕국 테라비시아에서의 우정과 성장 이야기. 뉴베리 수상작이에요.'},
+        {title:'캡틴 언더팬츠 2',author:'데이브 필키',tags:['유머','모험'],category:'문학',comic:true,reason:'캡틴 언더팬츠의 새로운 모험! 웃음이 멈추지 않아요.'},
+        {title:'수상한 편의점',author:'박현숙',tags:['미스터리','일상'],category:'문학',reason:'편의점에서 벌어지는 수상한 사건을 해결하는 미스터리예요.'},
+        {title:'이상한 과자 가게 전천당 4',author:'히로시마 레이코',tags:['판타지','교훈'],category:'문학',reason:'마법 과자의 힘을 어떻게 쓰느냐에 따라 결과가 달라져요.'},
+        // ── 4학년 비문학 (30) ──
+        {title:'WHY? 인공지능',author:'예림당',tags:['AI','기술'],category:'비문학',comic:true,reason:'인공지능의 원리와 미래를 만화로 쉽게 알려줘요.'},
+        {title:'WHY? 유전과 혈액',author:'예림당',tags:['유전','과학'],category:'비문학',comic:true,reason:'유전과 혈액의 비밀을 만화로 재미있게 배워요.'},
+        {title:'WHY? 뇌',author:'예림당',tags:['뇌','과학'],category:'비문학',comic:true,reason:'우리 뇌가 어떻게 작동하는지 만화로 알려줘요.'},
+        {title:'살아남기 시리즈: 화산에서 살아남기',author:'코믹컴',tags:['화산','과학'],category:'비문학',comic:true,reason:'화산 폭발의 과학과 생존법을 만화로 배워요.'},
+        {title:'살아남기 시리즈: 지진에서 살아남기',author:'코믹컴',tags:['지진','과학'],category:'비문학',comic:true,reason:'지진이 왜 일어나고 어떻게 대비하는지 만화로 배워요.'},
+        {title:'살아남기 시리즈: 남극에서 살아남기',author:'코믹컴',tags:['남극','과학'],category:'비문학',comic:true,reason:'남극의 극한 환경과 과학 지식을 만화로 배워요.'},
+        {title:'과학실험왕 3: 빛의 대결',author:'스토리 a.',tags:['빛','과학'],category:'비문학',comic:true,reason:'빛의 성질과 반사, 굴절을 실험 대결로 배워요.'},
+        {title:'과학실험왕 5: 전기의 대결',author:'스토리 a.',tags:['전기','과학'],category:'비문학',comic:true,reason:'전기의 원리를 실험 배틀 만화로 재미있게 배워요.'},
+        {title:'수학도둑 3',author:'송도수',tags:['수학','논리'],category:'비문학',comic:true,reason:'분수와 소수를 모험 만화로 재미있게 배워요.'},
+        {title:'설민석의 한국사 대모험 3',author:'설민석',tags:['한국사','역사'],category:'비문학',comic:true,reason:'고려 시대의 역사를 만화 모험으로 신나게 배워요.'},
+        {title:'설민석의 한국사 대모험 4',author:'설민석',tags:['한국사','역사'],category:'비문학',comic:true,reason:'조선 시대의 역사를 만화 모험으로 재미있게 배워요.'},
+        {title:'그리스 로마 신화 1',author:'박시연',tags:['신화','문화'],category:'비문학',comic:true,reason:'그리스 로마 신화를 만화로 재미있게 만나볼 수 있어요.'},
+        {title:'그리스 로마 신화 2',author:'박시연',tags:['신화','문화'],category:'비문학',comic:true,reason:'올림포스 신들의 이야기를 만화로 흥미진진하게 배워요.'},
+        {title:'지도 밖으로 행군하라',author:'한비야',tags:['여행','도전'],category:'비문학',reason:'세계 곳곳을 누빈 한비야의 도전과 여행 이야기예요.'},
+        {title:'한국을 빛낸 100명의 위인들',author:'편집부',tags:['인물','역사'],category:'비문학',reason:'한국 역사 속 위인들의 이야기를 한 권에 만나봐요.'},
+        {title:'자연관찰 도감',author:'윤주복',tags:['자연','관찰'],category:'비문학',reason:'주변 자연을 관찰하고 기록하는 방법을 알려줘요.'},
+        {title:'아이스크림 한 입의 경제학',author:'남윤지',tags:['경제','생활'],category:'비문학',reason:'아이스크림으로 시작하는 재미있는 경제 이야기예요.'},
+        {title:'용선생의 시끌벅적 한국사 1',author:'사회평론',tags:['한국사','역사'],category:'비문학',reason:'한국사를 캐릭터와 재미있는 스토리로 풀어줘요.'},
+        {title:'용선생의 시끌벅적 한국사 2',author:'사회평론',tags:['한국사','역사'],category:'비문학',reason:'삼국시대의 역사를 재미있는 이야기로 배워요.'},
+        {title:'어린이를 위한 독도 이야기',author:'한국영토학회',tags:['독도','역사'],category:'비문학',reason:'우리 땅 독도의 역사와 중요성을 쉽게 알려줘요.'},
+        {title:'세계 문화유산 여행',author:'유네스코한국위원회',tags:['문화','세계'],category:'비문학',reason:'세계의 소중한 문화유산을 사진과 함께 둘러봐요.'},
+        {title:'코딩 첫걸음',author:'DK출판사',tags:['코딩','기술'],category:'비문학',reason:'코딩의 기초 개념을 그림과 함께 쉽게 배워요.'},
+        {title:'내일은 발명왕 3',author:'곰돌이 co.',tags:['발명','과학'],category:'비문학',comic:true,reason:'생활 속 발명 아이디어를 만화로 재미있게 알려줘요.'},
+        {title:'어린이 과학 형사대 CSI 1',author:'고희정',tags:['과학','추리'],category:'비문학',comic:true,reason:'과학 수사로 사건을 해결하는 추리 만화예요.'},
+        {title:'초등학생을 위한 요리 과학',author:'과학동아',tags:['요리','과학'],category:'비문학',reason:'요리 속에 숨은 과학 원리를 실험하며 배워요.'},
+        {title:'어린이 경제 신문',author:'한국경제교육학회',tags:['경제','시사'],category:'비문학',reason:'어린이 눈높이로 경제 뉴스와 상식을 전해줘요.'},
+        {title:'나도 유튜버가 될 수 있을까',author:'김세중',tags:['미디어','직업'],category:'비문학',reason:'유튜버의 세계와 미디어 리터러시를 알려줘요.'},
+        {title:'4학년을 위한 교과서 속 과학',author:'아이세움',tags:['과학','교과서'],category:'비문학',reason:'교과서에 나오는 과학 개념을 쉽게 풀어줘요.'},
+        {title:'기후 변화, 쉽게 알려줘!',author:'이은희',tags:['기후','환경'],category:'비문학',reason:'기후 변화가 왜 일어나고 무엇을 할 수 있는지 알려줘요.'},
+        {title:'세계 지리 한 바퀴',author:'하이라이트',tags:['지리','세계'],category:'비문학',reason:'세계 여러 나라의 지리와 문화를 한 바퀴 둘러봐요.'}
+      ],
+      5: [
+        // ── 5학년 문학 (30) ──
+        {title:'완득이',author:'김려령',tags:['성장','다문화'],category:'문학',reason:'다문화 가정 소년의 성장 이야기. 편견을 넘어 성장하는 과정이 감동적이에요.'},
+        {title:'원더',author:'R.J. 팔라시오',tags:['다양성','용기'],category:'문학',reason:'얼굴이 남다른 어기의 학교생활. 마음으로 사람을 보는 법을 배워요.'},
+        {title:'해리 포터와 마법사의 돌',author:'J.K. 롤링',tags:['판타지','우정'],category:'문학',reason:'마법 세계 호그와트의 모험! 우정과 용기의 가치를 배워요.'},
+        {title:'퍼시 잭슨과 번개 도둑',author:'릭 라이어던',tags:['신화','모험'],category:'문학',reason:'그리스 신화를 현대적으로 재해석한 흥미진진한 모험이에요.'},
+        {title:'위풍당당 여우 꼬리',author:'손원평',tags:['정체성','학교'],category:'문학',reason:'비밀을 가진 전학생의 학교생활. 정체성에 대해 고민하게 해요.'},
+        {title:'아몬드',author:'손원평',tags:['감정','성장'],category:'문학',reason:'감정을 느끼지 못하는 소년이 감정을 배워가는 감동적인 이야기예요.'},
+        {title:'몬스터 콜스',author:'패트릭 네스',tags:['감정','치유'],category:'문학',reason:'괴물이 들려주는 세 가지 이야기. 슬픔을 마주하는 용기를 줘요.'},
+        {title:'구해줘 카카오',author:'배유안',tags:['환경','동물'],category:'문학',reason:'야생동물 보호를 다룬 이야기. 동물권에 대해 생각하게 해요.'},
+        {title:'시간의 주름',author:'매들렌 렝글',tags:['SF','가족'],category:'문학',reason:'시공간을 넘나드는 가족 구출 대모험! 뉴베리 수상작이에요.'},
+        {title:'수상한 도서관',author:'박현숙',tags:['미스터리','학교'],category:'문학',reason:'학교 도서관에서 벌어지는 미스터리! 추리의 재미를 느껴요.'},
+        {title:'빨강 연필',author:'박경희',tags:['성장','학교'],category:'문학',reason:'5학년 소녀의 학교생활과 성장을 섬세하게 그린 이야기예요.'},
+        {title:'어린 사자의 시간',author:'김유정',tags:['성장','사춘기'],category:'문학',reason:'사춘기 5학년의 복잡한 마음을 섬세하게 그린 이야기예요.'},
+        {title:'나니아 연대기: 캐스피언 왕자',author:'C.S. 루이스',tags:['판타지','모험'],category:'문학',reason:'나니아에 돌아온 아이들의 새로운 모험이 시작돼요.'},
+        {title:'비밀의 숲',author:'전성현',tags:['미스터리','환경'],category:'문학',reason:'숲에서 벌어지는 미스터리와 자연 보호의 메시지를 담았어요.'},
+        {title:'달빛 마셔요',author:'켈리 반힐',tags:['판타지','마법'],category:'문학',reason:'뉴베리상 수상작! 마법의 힘을 가진 소녀의 성장 이야기예요.'},
+        {title:'마당을 나온 암탉 2: 돌아온 잎싹',author:'황선미',tags:['성장','가족'],category:'문학',reason:'잎싹의 아들 초록이의 이야기. 성장과 독립을 그려요.'},
+        {title:'날아라 고무신 연작',author:'문선이',tags:['우정','학교'],category:'문학',reason:'5학년 아이들의 학교생활과 우정을 현실감 있게 그렸어요.'},
+        {title:'그리고 모든 것이 변했다',author:'기예르모 데 토레',tags:['성장','변화'],category:'문학',reason:'변화 앞에 선 어린이의 마음을 섬세하게 그린 이야기예요.'},
+        {title:'어느 날 우리 반에 공룡이 전학 왔다',author:'박현숙',tags:['학교','유머'],category:'문학',reason:'교실에 공룡이 나타난다면? 재미있고 따뜻한 학교 이야기예요.'},
+        {title:'보이지 않는 아이',author:'토베 얀손',tags:['자존감','감정'],category:'문학',reason:'투명해진 아이가 자기 모습을 되찾는 무민 이야기예요.'},
+        {title:'열세 살, 진짜 내 마음',author:'이금이',tags:['성장','감정'],category:'문학',reason:'사춘기를 겪는 아이의 진짜 마음을 섬세하게 표현했어요.'},
+        {title:'내 이름은 망고',author:'메가 메디나',tags:['가족','다문화'],category:'문학',reason:'다문화 가정 소녀의 성장 이야기. 정체성과 가족 사랑을 그려요.'},
+        {title:'유리 가면',author:'박현숙',tags:['추리','학교'],category:'문학',reason:'학교에서 벌어지는 미스터리를 친구들과 풀어가는 추리 이야기예요.'},
+        {title:'해리 포터와 비밀의 방',author:'J.K. 롤링',tags:['판타지','모험'],category:'문학',reason:'호그와트의 비밀 통로가 열리고 새로운 위험이 시작돼요.'},
+        {title:'미스 페레그린과 이상한 아이들의 집',author:'랜섬 릭스',tags:['판타지','미스터리'],category:'문학',reason:'시간이 멈춘 섬에서 특별한 능력을 가진 아이들을 만나요.'},
+        {title:'수상한 전학생',author:'박현숙',tags:['미스터리','학교'],category:'문학',reason:'전학 온 수상한 아이의 비밀을 파헤치는 미스터리 이야기예요.'},
+        {title:'이상한 과자 가게 전천당 5',author:'히로시마 레이코',tags:['판타지','선택'],category:'문학',reason:'전천당의 마법 과자가 가져다주는 예상치 못한 결과!'},
+        {title:'조지의 우주를 여는 비밀 열쇠',author:'루시 호킹',tags:['SF','우주'],category:'문학',reason:'호킹 박사의 딸이 쓴 우주 모험! 과학과 모험이 함께해요.'},
+        {title:'아르테미스 파울',author:'오언 콜퍼',tags:['판타지','모험'],category:'문학',reason:'천재 소년 범죄자와 요정 세계의 대결! 스릴 넘치는 판타지예요.'},
+        {title:'고양이 해결사 깜냥 3',author:'홍민정',tags:['모험','추리'],category:'문학',reason:'깜냥이 더 큰 사건에 도전해요! 추리의 재미가 커져요.'},
+        // ── 5학년 비문학 (30) ──
+        {title:'용선생의 시끌벅적 한국사 3',author:'사회평론',tags:['한국사','역사'],category:'비문학',reason:'고려 시대의 역사를 재미있는 이야기로 배워요.'},
+        {title:'용선생의 시끌벅적 한국사 4',author:'사회평론',tags:['한국사','역사'],category:'비문학',reason:'조선 시대의 역사를 재미있는 이야기로 배워요.'},
+        {title:'설민석의 한국사 대모험 5',author:'설민석',tags:['한국사','역사'],category:'비문학',comic:true,reason:'조선 후기의 역사를 만화 모험으로 재미있게 배워요.'},
+        {title:'설민석의 한국사 대모험 6',author:'설민석',tags:['한국사','역사'],category:'비문학',comic:true,reason:'근대 한국사를 만화 모험으로 흥미진진하게 배워요.'},
+        {title:'과학실험왕 7: 인체의 대결',author:'스토리 a.',tags:['인체','과학'],category:'비문학',comic:true,reason:'인체의 신비를 실험 대결 만화로 배워요.'},
+        {title:'과학실험왕 9: 날씨의 대결',author:'스토리 a.',tags:['날씨','과학'],category:'비문학',comic:true,reason:'날씨의 원리를 실험 대결 만화로 배워요.'},
+        {title:'수학도둑 5',author:'송도수',tags:['수학','논리'],category:'비문학',comic:true,reason:'확률과 통계를 모험 만화로 재미있게 배워요.'},
+        {title:'살아남기 시리즈: 태풍에서 살아남기',author:'코믹컴',tags:['태풍','과학'],category:'비문학',comic:true,reason:'태풍의 과학과 재난 대비법을 만화로 배워요.'},
+        {title:'살아남기 시리즈: 아마존에서 살아남기',author:'코믹컴',tags:['정글','과학'],category:'비문학',comic:true,reason:'아마존 열대우림의 생태와 생존법을 만화로 배워요.'},
+        {title:'어린이를 위한 정의란 무엇인가',author:'안미란',tags:['철학','정의'],category:'비문학',reason:'공정함과 정의에 대해 스스로 생각해보게 하는 책이에요.'},
+        {title:'역사가 뭐길래',author:'김영숙',tags:['역사','교양'],category:'비문학',reason:'역사를 왜 배워야 하는지 재미있게 알려줘요.'},
+        {title:'지구의 미래를 부탁해',author:'조엘 하퍼',tags:['환경','미래'],category:'비문학',reason:'기후 위기 시대에 우리가 할 수 있는 일을 알려줘요.'},
+        {title:'나의 첫 세계사',author:'수잔 와이즈 바우어',tags:['역사','세계'],category:'비문학',reason:'세계 역사를 이야기처럼 풀어낸 역사서예요.'},
+        {title:'별난 과학 교실',author:'서지원',tags:['과학','실험'],category:'비문학',reason:'일상 속 궁금한 과학 원리를 실험과 함께 알려줘요.'},
+        {title:'어린이를 위한 그릿',author:'안젤라 더크워스(어린이판)',tags:['성장','동기부여'],category:'비문학',reason:'끈기와 열정의 힘을 어린이 눈높이로 알려줘요.'},
+        {title:'미래가 온다: 로봇',author:'김성화',tags:['과학','미래'],category:'비문학',reason:'로봇과 인공지능의 미래를 쉽고 재미있게 알려줘요.'},
+        {title:'어린이 경제 수업',author:'이재영',tags:['경제','사회'],category:'비문학',reason:'용돈 관리부터 경제 원리까지 쉽게 배워요.'},
+        {title:'WHY? 인공지능과 로봇',author:'예림당',tags:['AI','기술'],category:'비문학',comic:true,reason:'인공지능과 로봇의 원리와 미래를 만화로 알려줘요.'},
+        {title:'슬기로운 미디어 생활',author:'금준경',tags:['미디어','사고력'],category:'비문학',reason:'미디어를 똑똑하게 사용하는 법! 가짜 뉴스도 구별해요.'},
+        {title:'씽크빅',author:'벤 카슨',tags:['인물','꿈'],category:'비문학',reason:'가난을 이기고 세계적 의사가 된 벤 카슨의 실화예요.'},
+        {title:'세상을 바꾼 위대한 과학 실험 100',author:'존 그리빈',tags:['과학','역사'],category:'비문학',reason:'과학사를 바꾼 위대한 실험들의 이야기예요.'},
+        {title:'어린이를 위한 민주주의',author:'안미란',tags:['사회','민주주의'],category:'비문학',reason:'민주주의란 무엇이고 왜 중요한지 알려줘요.'},
+        {title:'코스모스',author:'칼 세이건(어린이판)',tags:['우주','과학'],category:'비문학',reason:'우주의 경이로움을 아름다운 문장으로 전해줘요.'},
+        {title:'초등학생을 위한 토론 수업',author:'한승희',tags:['토론','사고력'],category:'비문학',reason:'논리적으로 생각하고 말하는 법을 배워요.'},
+        {title:'씨앗들에게 보내는 편지',author:'황경신',tags:['성장','편지'],category:'비문학',reason:'어른이 아이들에게 보내는 따뜻한 편지 모음이에요.'},
+        {title:'10대를 위한 공정무역',author:'심이운',tags:['경제','세계'],category:'비문학',reason:'공정무역이 왜 필요한지 실제 사례로 알려줘요.'},
+        {title:'어린이 과학 형사대 CSI 5',author:'고희정',tags:['과학','추리'],category:'비문학',comic:true,reason:'과학 수사로 사건을 해결하는 추리 만화예요.'},
+        {title:'5학년을 위한 교과서 속 사회',author:'아이세움',tags:['사회','교과서'],category:'비문학',reason:'5학년 사회 교과서의 핵심 개념을 쉽게 풀어줘요.'},
+        {title:'나도 유튜브 크리에이터',author:'김세중',tags:['미디어','직업'],category:'비문학',reason:'유튜브 크리에이터의 세계와 디지털 윤리를 알려줘요.'},
+        {title:'어린이를 위한 세계 인권 선언',author:'국제앰네스티',tags:['인권','사회'],category:'비문학',reason:'모든 사람이 가진 소중한 인권을 쉽게 알려줘요.'}
+      ],
+      6: [
+        // ── 6학년 문학 (30) ──
+        {title:'모모',author:'미하엘 엔데',tags:['시간','철학'],category:'문학',reason:'시간 도둑에게서 시간을 되찾는 모모의 이야기예요.'},
+        {title:'위저드 베이커리',author:'구병모',tags:['판타지','성장'],category:'문학',reason:'마법 빵집에서 벌어지는 성장과 치유의 이야기예요.'},
+        {title:'어른이 되면',author:'이금이',tags:['성장','미래'],category:'문학',reason:'어른이 된다는 것의 의미를 고민하는 졸업 앞둔 6학년 이야기예요.'},
+        {title:'엔더의 게임',author:'오슨 스콧 카드',tags:['SF','리더십'],category:'문학',reason:'천재 소년 엔더의 우주 전쟁! 리더십과 도덕적 딜레마를 다뤄요.'},
+        {title:'수학 귀신',author:'한스 마그누스 엔첸스베르거',tags:['수학','판타지'],category:'문학',reason:'수학 싫어하는 소년의 꿈에 나타나는 수학 귀신의 이야기예요.'},
+        {title:'열세 살의 여름',author:'이금이',tags:['성장','우정'],category:'문학',reason:'열세 살 여름의 특별한 경험을 그린 성장 소설이에요.'},
+        {title:'꼭 한 번은 빌려 드립니다',author:'남유하',tags:['판타지','성장'],category:'문학',reason:'신비한 가게에서 빌리는 것들을 통해 성장하는 이야기예요.'},
+        {title:'수일이와 수일이',author:'김우경',tags:['판타지','정체성'],category:'문학',reason:'자기와 똑같은 아이를 만난 소년의 정체성 탐구 이야기예요.'},
+        {title:'투명 인간의 고백',author:'김초엽',tags:['SF','소통'],category:'문학',reason:'투명인간이 되면 행복할까? 소통의 의미를 생각하게 해요.'},
+        {title:'나미야 잡화점의 기적',author:'히가시노 게이고',tags:['감동','시간'],category:'문학',reason:'과거와 현재를 잇는 편지의 기적! 따뜻한 연결을 느껴요.'},
+        {title:'전학 와서 생긴 일',author:'문선이',tags:['학교','우정'],category:'문학',reason:'6학년 전학생의 학교 적응과 우정을 현실감 있게 그렸어요.'},
+        {title:'해리 포터와 아즈카반의 죄수',author:'J.K. 롤링',tags:['판타지','모험'],category:'문학',reason:'시간여행과 새로운 진실! 해리 포터 시리즈의 전환점이에요.'},
+        {title:'퍼시 잭슨과 괴물의 바다',author:'릭 라이어던',tags:['신화','모험'],category:'문학',reason:'괴물의 바다에서 친구를 구하는 퍼시의 두 번째 모험이에요.'},
+        {title:'기버: 기억 전달자',author:'로이스 로리',tags:['SF','사회'],category:'문학',reason:'완벽해 보이는 사회의 비밀을 파헤치는 뉴베리 수상작이에요.'},
+        {title:'미스터리 베네딕트 소사이어티',author:'트렌턴 리 스튜어트',tags:['추리','모험'],category:'문학',reason:'특별한 아이들이 모여 비밀 임무를 수행하는 추리 모험이에요.'},
+        {title:'고양이 전사들: 야생으로',author:'에린 헌터',tags:['판타지','모험'],category:'문학',reason:'집고양이가 야생 고양이 부족의 전사가 되는 장대한 모험이에요.'},
+        {title:'갈매기에게 나는 법을 가르쳐준 고양이',author:'루이스 세풀베다',tags:['성장','사랑'],category:'문학',reason:'아기 갈매기를 키우는 고양이의 약속과 사랑 이야기예요.'},
+        {title:'클로디아의 비밀',author:'E.L. 커닝스버그',tags:['모험','예술'],category:'문학',reason:'메트로폴리탄 미술관에 숨어 사는 남매의 비밀 모험! 뉴베리 수상작이에요.'},
+        {title:'초정리 편지',author:'배유안',tags:['역사','성장'],category:'문학',reason:'조선 시대로 편지가 이어지는 시간을 넘은 우정 이야기예요.'},
+        {title:'이상한 과자 가게 전천당 7',author:'히로시마 레이코',tags:['판타지','선택'],category:'문학',reason:'전천당의 마법 과자들이 가져오는 새로운 이야기!'},
+        {title:'윔피키드 2: 로드릭의 법칙',author:'제프 키니',tags:['학교','유머'],category:'문학',comic:true,reason:'그레그와 형 로드릭의 좌충우돌 일상! 웃음이 멈추지 않아요.'},
+        {title:'수상한 선생님',author:'박현숙',tags:['미스터리','학교'],category:'문학',reason:'새로 온 선생님의 수상한 비밀을 추리하는 이야기예요.'},
+        {title:'캡틴 언더팬츠 3',author:'데이브 필키',tags:['유머','모험'],category:'문학',comic:true,reason:'캡틴 언더팬츠의 새로운 모험! 유머와 액션이 넘쳐요.'},
+        {title:'괴물 길들이기',author:'크레시다 코웰',tags:['판타지','용기'],category:'문학',reason:'바이킹 소년 히컵이 용을 길들이며 성장하는 모험이에요.'},
+        {title:'고양이 해결사 깜냥 4',author:'홍민정',tags:['모험','추리'],category:'문학',reason:'깜냥의 가장 큰 사건! 더욱 커진 미스터리와 모험이에요.'},
+        {title:'이상한 과자 가게 전천당 8',author:'히로시마 레이코',tags:['판타지','교훈'],category:'문학',reason:'마법 과자를 통해 인생의 교훈을 재미있게 전해줘요.'},
+        {title:'너도 하늘말나리야',author:'이금이',tags:['성장','가족'],category:'문학',reason:'가족의 의미와 성장의 아픔을 섬세하게 그린 이금이의 동화예요.'},
+        {title:'방과 후 초능력 클럽 2',author:'김리리',tags:['판타지','학교'],category:'문학',reason:'초능력 클럽의 새로운 모험! 더 강력한 힘과 더 큰 비밀이 기다려요.'},
+        {title:'아르테미스 파울 2: 북극 사건',author:'오언 콜퍼',tags:['판타지','모험'],category:'문학',reason:'천재 소년과 요정의 새로운 대결! 북극에서 벌어지는 모험이에요.'},
+        {title:'수상한 동물원',author:'박현숙',tags:['미스터리','동물'],category:'문학',reason:'동물원에서 벌어지는 수상한 사건의 비밀을 파헤쳐요.'},
+        // ── 6학년 비문학 (30) ──
+        {title:'용선생의 시끌벅적 한국사 5',author:'사회평론',tags:['한국사','역사'],category:'비문학',reason:'근현대 한국사를 재미있는 이야기로 배워요.'},
+        {title:'용선생의 시끌벅적 세계사 1',author:'사회평론',tags:['세계사','역사'],category:'비문학',reason:'고대 문명부터 세계 역사를 재미있게 풀어줘요.'},
+        {title:'설민석의 한국사 대모험 7',author:'설민석',tags:['한국사','역사'],category:'비문학',comic:true,reason:'근대 한국사를 만화 모험으로 신나게 배워요.'},
+        {title:'설민석의 한국사 대모험 8',author:'설민석',tags:['한국사','역사'],category:'비문학',comic:true,reason:'일제강점기의 역사를 만화 모험으로 배워요.'},
+        {title:'과학실험왕 11: 물의 대결',author:'스토리 a.',tags:['물','과학'],category:'비문학',comic:true,reason:'물의 성질과 순환을 실험 대결 만화로 배워요.'},
+        {title:'과학실험왕 15: 지구의 대결',author:'스토리 a.',tags:['지구','과학'],category:'비문학',comic:true,reason:'지구과학의 원리를 실험 대결 만화로 배워요.'},
+        {title:'수학도둑 7',author:'송도수',tags:['수학','논리'],category:'비문학',comic:true,reason:'방정식과 함수를 모험 만화로 재미있게 배워요.'},
+        {title:'살아남기 시리즈: 히말라야에서 살아남기',author:'코믹컴',tags:['산악','과학'],category:'비문학',comic:true,reason:'히말라야의 극한 환경과 과학을 만화로 배워요.'},
+        {title:'살아남기 시리즈: 우주에서 살아남기',author:'코믹컴',tags:['우주','과학'],category:'비문학',comic:true,reason:'우주 환경의 과학과 생존법을 만화로 배워요.'},
+        {title:'세계시민 수업',author:'조혜인',tags:['세계','시민'],category:'비문학',reason:'글로벌 시대에 세계시민으로 살아가는 법을 알려줘요.'},
+        {title:'나는 미래를 만드는 아이',author:'최형미',tags:['미래','직업'],category:'비문학',reason:'미래 직업과 기술 변화를 알려주는 진로 탐색서예요.'},
+        {title:'정의의 반대말은 무관심이다',author:'박재현',tags:['사회','시민'],category:'비문학',reason:'사회 문제에 관심을 갖는 것이 왜 중요한지 알려줘요.'},
+        {title:'코스모스',author:'칼 세이건(어린이판)',tags:['우주','과학'],category:'비문학',reason:'우주의 경이로움을 아름다운 문장으로 전하는 과학 고전이에요.'},
+        {title:'페르마의 마지막 정리',author:'사이먼 싱(어린이판)',tags:['수학','도전'],category:'비문학',reason:'350년간 풀리지 않은 수학 문제의 도전기예요.'},
+        {title:'탈무드',author:'마빈 토케이어',tags:['지혜','철학'],category:'비문학',reason:'수천 년 유대인의 지혜가 담긴 이야기 모음이에요.'},
+        {title:'초등학생을 위한 토론 수업',author:'한승희',tags:['토론','사고력'],category:'비문학',reason:'논리적으로 생각하고 말하는 법을 배워요.'},
+        {title:'세상을 바꾼 위대한 과학 실험 100',author:'존 그리빈',tags:['과학','역사'],category:'비문학',reason:'과학사를 바꾼 위대한 실험들의 이야기예요.'},
+        {title:'어린이를 위한 민주주의',author:'안미란',tags:['사회','민주주의'],category:'비문학',reason:'민주주의란 무엇이고 왜 중요한지 알려줘요.'},
+        {title:'세상에서 가장 재미있는 세계사',author:'래리 고닉',tags:['역사','세계'],category:'비문학',comic:true,reason:'만화로 풀어낸 세계 역사! 큰 흐름을 이해할 수 있어요.'},
+        {title:'주니어 리더십',author:'존 맥스웰(어린이판)',tags:['리더십','성장'],category:'비문학',reason:'리더가 되기 위한 자질과 태도를 알려줘요.'},
+        {title:'지금 이대로가 좋아',author:'최숙희',tags:['자존감','성찰'],category:'비문학',reason:'있는 그대로의 나를 받아들이는 법을 알려줘요.'},
+        {title:'어린이를 위한 미래 과학',author:'최재천',tags:['과학','미래'],category:'비문학',reason:'미래에 펼쳐질 놀라운 과학 기술을 쉽게 알려줘요.'},
+        {title:'10대를 위한 공정무역',author:'심이운',tags:['경제','세계'],category:'비문학',reason:'공정무역이 왜 필요한지 실제 사례로 알려줘요.'},
+        {title:'어린이를 위한 세계 인권 선언',author:'국제앰네스티',tags:['인권','사회'],category:'비문학',reason:'모든 사람이 가진 소중한 인권을 쉽게 알려줘요.'},
+        {title:'WHY? 반도체',author:'예림당',tags:['기술','과학'],category:'비문학',comic:true,reason:'반도체가 무엇이고 왜 중요한지 만화로 알려줘요.'},
+        {title:'어린이 과학 형사대 CSI 10',author:'고희정',tags:['과학','추리'],category:'비문학',comic:true,reason:'과학 수사 기법으로 사건을 해결하는 추리 만화예요.'},
+        {title:'6학년을 위한 교과서 속 사회',author:'아이세움',tags:['사회','교과서'],category:'비문학',reason:'6학년 사회 교과서의 핵심 개념을 쉽게 풀어줘요.'},
+        {title:'나도 프로그래머가 될 수 있다',author:'DK출판사',tags:['코딩','기술'],category:'비문학',reason:'프로그래밍의 기초부터 실습까지 단계별로 배워요.'},
+        {title:'선거, 어렵지 않아요',author:'안미란',tags:['정치','시민'],category:'비문학',reason:'선거와 민주주의의 중요성을 쉽고 재미있게 알려줘요.'},
+        {title:'씽크빅',author:'벤 카슨',tags:['인물','꿈'],category:'비문학',reason:'가난을 이기고 세계적 의사가 된 벤 카슨의 실화예요.'}
+      ]
+    };
+
+    // ── 1~4학년 카테고리 자동 배정 ──
+    (function() {
+      var nfTags = {과학:1,역사:1,환경:1,인물:1,직업:1,교양:1,세계:1,경제:1,건강:1,시민:1,AI:1,우주:1,리더십:1,사회:1,미래:1,실천:1,관찰:1,지리:1,신화:1,문화:1,수학:1,도전:1,문명:1,평화:1,순환:1};
+      for (var g = 1; g <= 6; g++) {
+        for (var i = 0; i < BOOKS[g].length; i++) {
+          if (!BOOKS[g][i].category) {
+            var isNF = false;
+            for (var t = 0; t < BOOKS[g][i].tags.length; t++) {
+              if (nfTags[BOOKS[g][i].tags[t]]) { isNF = true; break; }
+            }
+            BOOKS[g][i].category = isNF ? '비문학' : '문학';
+          }
+        }
+      }
+    })();
+
+    // ── 더미 리뷰 데이터 (이름·학년·별점·내용 풀) ──
+    var REVIEW_NAMES = [
+      {name:'민서',emoji:'\u{1F467}',bg:'#E8D5F5'},{name:'지호',emoji:'\u{1F466}',bg:'#D5EAF5'},
+      {name:'하은',emoji:'\u{1F467}',bg:'#D5F5E3'},{name:'서준',emoji:'\u{1F466}',bg:'#FFF3CD'},
+      {name:'예린',emoji:'\u{1F467}',bg:'#F5D5D5'},{name:'도윤',emoji:'\u{1F466}',bg:'#D5F5F0'},
+      {name:'수아',emoji:'\u{1F467}',bg:'#F0E0FF'},{name:'준혁',emoji:'\u{1F466}',bg:'#E0F0FF'},
+      {name:'지유',emoji:'\u{1F467}',bg:'#E0FFE8'},{name:'시우',emoji:'\u{1F466}',bg:'#FFECB3'},
+      {name:'채원',emoji:'\u{1F467}',bg:'#FFE0E0'},{name:'건우',emoji:'\u{1F466}',bg:'#E0FFF5'}
+    ];
+    var REVIEW_TEMPLATES = [
+      '정말 재미있었어요! 한 번 읽기 시작하면 멈출 수가 없었어요.',
+      '이 책 읽고 나서 친구한테도 추천했어요. 같이 읽으면 더 재미있어요!',
+      '처음엔 어려울 줄 알았는데 읽다 보니 쉽고 재미있었어요.',
+      '감동받았어요. 읽고 나서 한참 생각에 잠겼어요.',
+      '그림도 예쁘고 이야기도 재미있어서 두 번이나 읽었어요!',
+      '학교 독서록에 쓰기 딱 좋은 책이에요. 쓸 내용이 많아요!',
+      '엄마랑 같이 읽었는데 엄마도 재미있다고 하셨어요.',
+      '이 작가의 다른 책도 찾아서 읽고 싶어졌어요.',
+      '주인공한테 응원을 보내고 싶었어요. 너무 멋있었어요!',
+      '읽으면서 울 뻔했어요. 마음이 따뜻해지는 책이에요.',
+      '상상력이 폭발하는 책! 나도 이런 모험을 떠나고 싶어요.',
+      '과학 시간에 배운 내용이 나와서 더 재미있게 읽었어요.'
+    ];
+
+    function getReviews(grade, idx) {
+      var seed = grade * 100 + idx;
+      var count = 2 + (seed % 2);
+      var reviews = [];
+      for (var r = 0; r < count; r++) {
+        var ni = (seed * 7 + r * 13) % REVIEW_NAMES.length;
+        var ti = (seed * 11 + r * 17) % REVIEW_TEMPLATES.length;
+        var stars = 4 + ((seed + r) % 2);
+        var reviewer = REVIEW_NAMES[ni];
+        reviews.push({
+          name: reviewer.name,
+          emoji: reviewer.emoji,
+          bg: reviewer.bg,
+          grade: 1 + ((seed + r * 3) % 6),
+          stars: stars,
+          text: REVIEW_TEMPLATES[ti]
+        });
+      }
+      return reviews;
+    }
+
+    function renderStars(n) {
+      var s = '';
+      for (var i = 0; i < 5; i++) s += i < n ? '★' : '☆';
+      return s;
+    }
+
+    function renderReviewsHtml(grade, idx) {
+      var reviews = getReviews(grade, idx);
+      var html = '<div class="review-section__title">\u{1F4AC} 독자 리뷰</div>';
+      for (var r = 0; r < reviews.length; r++) {
+        var rv = reviews[r];
+        html += '<div class="review-item">' +
+          '<div class="review-item__header">' +
+            '<div class="review-item__avatar" style="background:' + rv.bg + '">' + rv.emoji + '</div>' +
+            '<span class="review-item__name">' + rv.name + ' (' + rv.grade + '학년)</span>' +
+            '<span class="review-item__stars">' + renderStars(rv.stars) + '</span>' +
+          '</div>' +
+          '<div class="review-item__text">' + rv.text + '</div>' +
+        '</div>';
+      }
+      return html;
+    }
+
+    // ── 구매 URL 생성 ──
+    function getBuyLinks(title) {
+      var encoded = encodeURIComponent(title);
+      return [
+        {name:'YES24', url:'https://www.yes24.com/Product/Search?domain=ALL&query=' + encoded},
+        {name:'교보문고', url:'https://search.kyobobook.co.kr/search?keyword=' + encoded},
+        {name:'알라딘', url:'https://www.aladin.co.kr/search/wsearchresult.aspx?SearchWord=' + encoded}
+      ];
+    }
+
+    function renderBuyLinksHtml(title) {
+      var links = getBuyLinks(title);
+      var html = '';
+      for (var i = 0; i < links.length; i++) {
+        html += '<a class="buy-link" href="' + links[i].url + '" target="_blank" rel="noopener">' +
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>' +
+          links[i].name +
+        '</a>';
+      }
+      return html;
+    }
+
+    // ── 오늘의 도서 새로고침 (세션 내 오프셋) ──
+    var refreshOffsets = {};
+    function getRefreshOffset(grade) { return refreshOffsets[grade] || 0; }
+    function refreshToday(grade, category) {
+      category = category || '전체';
+      var filtered = getFilteredBooks(grade, category);
+      refreshOffsets[grade] = (getRefreshOffset(grade) + 1) % filtered.length;
+      navigate('recommend', {grade: grade, category: category});
+    }
+
+    // ── 로컬스토리지 유틸 ──
+    function storageKey(type, grade, idx) { return 'book_' + type + '_' + grade + '_' + idx; }
+
+    function isRead(grade, idx) {
+      return localStorage.getItem(storageKey('read', grade, idx)) === '1';
+    }
+    function toggleRead(grade, idx) {
+      var key = storageKey('read', grade, idx);
+      if (localStorage.getItem(key) === '1') localStorage.removeItem(key);
+      else localStorage.setItem(key, '1');
+    }
+    function isFav(grade, idx) {
+      return localStorage.getItem(storageKey('fav', grade, idx)) === '1';
+    }
+    function toggleFav(grade, idx) {
+      var key = storageKey('fav', grade, idx);
+      if (localStorage.getItem(key) === '1') localStorage.removeItem(key);
+      else localStorage.setItem(key, '1');
+    }
+    function getReadCount(grade) {
+      var count = 0;
+      for (var i = 0; i < BOOKS[grade].length; i++) {
+        if (isRead(grade, i)) count++;
+      }
+      return count;
+    }
+
+    // ── 모달 ──
+    function openModal(grade, idx) {
+      var book = BOOKS[grade][idx];
+      var cc = COVER_COLORS[idx % COVER_COLORS.length];
+      var be = BOOK_EMOJI[idx % BOOK_EMOJI.length];
+      var read = isRead(grade, idx);
+      var fav = isFav(grade, idx);
+
+      var tagsHtml = '';
+      for (var t = 0; t < book.tags.length; t++) {
+        tagsHtml += '<span class="modal__tag">' + book.tags[t] + '</span>';
+      }
+      if (book.comic) tagsHtml += '<span class="modal__tag tag--comic">\u{1F4D6} 만화</span>';
+
+      var overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      overlay.id = 'modalOverlay';
+      overlay.innerHTML =
+        '<div class="modal" onclick="event.stopPropagation()">' +
+          '<div class="modal__header">' +
+            '<div class="modal__cover" style="background:' + cc + '">' + be + '</div>' +
+            '<div class="modal__info">' +
+              '<div class="modal__title">' + book.title + '</div>' +
+              '<div class="modal__author">' + book.author + '</div>' +
+              '<div class="modal__tags">' + tagsHtml + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="modal__reason">' +
+            '<div class="modal__reason-label">\u{1F4A1} 이 책을 추천하는 이유</div>' +
+            '<p class="modal__reason-text">' + book.reason + '</p>' +
+          '</div>' +
+          '<div class="modal__reviews review-section">' +
+            renderReviewsHtml(grade, idx) +
+          '</div>' +
+          '<div class="modal__buy buy-links">' +
+            '<div class="buy-links__title">\u{1F6D2} 이 책 구매하기</div>' +
+            renderBuyLinksHtml(book.title) +
+          '</div>' +
+          '<div class="modal__actions">' +
+            '<button class="btn ' + (read ? 'btn--green' : 'btn--outline') + '" onclick="onModalRead(' + grade + ',' + idx + ')">' +
+              (read ? '✅ 읽었어요' : '\u{1F4D6} 읽음 표시') +
+            '</button>' +
+            '<button class="btn ' + (fav ? 'btn--yellow' : 'btn--outline') + '" onclick="onModalFav(' + grade + ',' + idx + ')">' +
+              (fav ? '\u{1F49B} 즐겨찾기' : '\u{1F90D} 즐겨찾기') +
+            '</button>' +
+          '</div>' +
+        '</div>';
+      overlay.addEventListener('click', closeModal);
+      document.body.appendChild(overlay);
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      var el = document.getElementById('modalOverlay');
+      if (el) el.remove();
+      document.body.style.overflow = '';
+    }
+
+    function onModalRead(grade, idx) {
+      toggleRead(grade, idx);
+      closeModal();
+      refreshBookList(grade);
+    }
+
+    function onModalFav(grade, idx) {
+      toggleFav(grade, idx);
+      closeModal();
+      openModal(grade, idx);
+    }
+
+    function refreshBookList(grade) {
+      var container = document.getElementById('bookListContainer');
+      if (!container) return;
+      var items = container.querySelectorAll('.book-list-item');
+      items.forEach(function(el) {
+        var i = parseInt(el.dataset.idx);
+        if (isRead(grade, i)) el.classList.add('book-list-item--read');
+        else el.classList.remove('book-list-item--read');
+      });
+      updateProgress(grade);
+    }
+
+    function updateProgress(grade) {
+      var fill = document.getElementById('progressFill');
+      var countEl = document.getElementById('progressCount');
+      if (!fill || !countEl) return;
+      var total = BOOKS[grade].length;
+      var read = getReadCount(grade);
+      fill.style.width = (read / total * 100) + '%';
+      countEl.textContent = read + ' / ' + total + '권 읽음';
+    }
+
+    function getTodayBookIndex(grade) {
+      var today = new Date();
+      var start = new Date(today.getFullYear(), 0, 0);
+      var dayOfYear = Math.floor((today - start) / 86400000);
+      return (dayOfYear + grade) % BOOKS[grade].length;
+    }
+
+    var currentPage = 'home';
+    var currentParams = {};
+
+    function navigate(page, params) {
+      currentPage = page;
+      currentParams = params || {};
+      render();
+      window.scrollTo(0, 0);
+    }
+
+    function renderHeader() {
+      return '<header class="header"><div class="container header__inner">' +
+        '<button class="header__logo" onclick="navigate(\'home\')">' +
+          '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
+            '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>' +
+            '<path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>' +
+            '<line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="13" y2="11"/>' +
+          '</svg> 오늘의 한 권' +
+        '</button>' +
+        '<nav class="header__nav">' +
+          '<button class="btn btn--outline header__nav-btn" onclick="navigate(\'home\')">학년 선택</button>' +
+        '</nav>' +
+      '</div></header>';
+    }
+
+    function renderFooter() {
+      return '<footer class="footer"><div class="container">' +
+        '<p>&copy; ' + new Date().getFullYear() + ' 오늘의 한 권 &mdash; 매일 한 권, 읽는 습관을 만들어요 \u{1F4DA}</p>' +
+      '</div></footer>';
+    }
+
+    function renderHomePage() {
+      var cards = '';
+      for (var i = 0; i < 6; i++) {
+        var grade = i + 1;
+        cards += '<button class="grade-card" style="--grade-color:' + GRADE_COLORS[i] + '" onclick="navigate(\'category\',{grade:' + grade + '})">' +
+          '<span class="grade-card__emoji">' + GRADE_EMOJI[i] + '</span>' +
+          '<span class="grade-card__label">' + grade + '학년</span>' +
+          '<span class="grade-card__sub">추천 도서 보기</span>' +
+        '</button>';
+      }
+      return '<section class="hero">' +
+        '<h1>오늘의 한 권 \u{1F4D6}</h1>' +
+        '<p>학년을 선택하면 매일 한 권의 추천 도서를 만나볼 수 있어요!</p>' +
+      '</section>' +
+      '<section class="grade-grid container">' + cards + '</section>';
+    }
+
+    function renderCategoryPage(grade) {
+      var litCount = 0, nfCount = 0;
+      for (var i = 0; i < BOOKS[grade].length; i++) {
+        if (BOOKS[grade][i].category === '문학') litCount++;
+        else nfCount++;
+      }
+      return '<div class="container">' +
+        '<section class="category-header">' +
+          '<div class="category-header__badge">' + GRADE_EMOJI[grade-1] + ' ' + grade + '학년</div>' +
+          '<h1>어떤 책을 읽고 싶나요?</h1>' +
+          '<p>문학과 비문학 중 선택해보세요!</p>' +
+        '</section>' +
+        '<div class="category-grid">' +
+          '<button class="category-card category-card--lit" onclick="navigate(\'recommend\',{grade:' + grade + ',category:\'문학\'})">' +
+            '<span class="category-card__emoji">\u{1F4D6}</span>' +
+            '<span class="category-card__label">문학</span>' +
+            '<span class="category-card__desc">동화, 소설, 시, 판타지 등<br>이야기가 있는 책</span>' +
+            '<span class="category-card__count">' + litCount + '권</span>' +
+          '</button>' +
+          '<button class="category-card category-card--nonlit" onclick="navigate(\'recommend\',{grade:' + grade + ',category:\'비문학\'})">' +
+            '<span class="category-card__emoji">\u{1F50D}</span>' +
+            '<span class="category-card__label">비문학</span>' +
+            '<span class="category-card__desc">과학, 역사, 경제, 인물 등<br>지식을 넓히는 책</span>' +
+            '<span class="category-card__count">' + nfCount + '권</span>' +
+          '</button>' +
+        '</div>' +
+        '<button class="category-all-btn" onclick="navigate(\'recommend\',{grade:' + grade + ',category:\'전체\'})">' +
+          '\u{1F4DA} 전체 보기 (' + BOOKS[grade].length + '권)' +
+        '</button>' +
+      '</div>';
+    }
+
+    function getFilteredBooks(grade, category) {
+      if (!category || category === '전체') return BOOKS[grade];
+      var filtered = [];
+      for (var i = 0; i < BOOKS[grade].length; i++) {
+        if (BOOKS[grade][i].category === category) filtered.push(BOOKS[grade][i]);
+      }
+      return filtered;
+    }
+
+    function getOriginalIndex(grade, book) {
+      for (var i = 0; i < BOOKS[grade].length; i++) {
+        if (BOOKS[grade][i] === book) return i;
+      }
+      return 0;
+    }
+
+    function renderRecommendPage(grade, category) {
+      category = category || '전체';
+      var allBooks = BOOKS[grade];
+      var books = getFilteredBooks(grade, category);
+      var todayFiltered = (getTodayBookIndex(grade) + getRefreshOffset(grade)) % books.length;
+      var todayBook = books[todayFiltered];
+      var todayIdx = getOriginalIndex(grade, todayBook);
+      var coverColor = COVER_COLORS[todayIdx % COVER_COLORS.length];
+      var emoji = BOOK_EMOJI[todayIdx % BOOK_EMOJI.length];
+
+      var today = new Date();
+      var dateStr = today.getFullYear() + '.' + String(today.getMonth()+1).padStart(2,'0') + '.' + String(today.getDate()).padStart(2,'0');
+
+      var tags = '';
+      for (var t = 0; t < todayBook.tags.length; t++) {
+        tags += '<span class="today-card__tag">' + todayBook.tags[t] + '</span>';
+      }
+      if (todayBook.comic) tags += '<span class="today-card__tag tag--comic">\u{1F4D6} 만화</span>';
+
+      var html = '<div class="container">' +
+        '<section class="recommend-header">' +
+          '<div class="recommend-header__badge">' +
+            GRADE_EMOJI[grade-1] + ' ' + grade + '학년 &middot; ' + (category !== '전체' ? category + ' &middot; ' : '') + dateStr +
+          '</div>' +
+          '<h1>오늘의 추천 도서</h1>' +
+          '<p>매일 새로운 책을 만나보세요!</p>' +
+          '<button class="refresh-btn" onclick="refreshToday(' + grade + ',\'' + category + '\')" title="다른 책 보기">' +
+            '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>' +
+            ' 다른 책 보기' +
+          '</button>' +
+        '</section>' +
+        '<article class="today-card">' +
+          '<div class="today-card__top">' +
+            '<div class="today-card__cover" style="background:' + coverColor + '">' + emoji + '</div>' +
+            '<div class="today-card__info">' +
+              '<span class="today-card__label">' +
+                '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>' +
+                ' 오늘의 한 권' +
+              '</span>' +
+              '<h2 class="today-card__title">' + todayBook.title + '</h2>' +
+              '<p class="today-card__author">' + todayBook.author + '</p>' +
+              '<div class="today-card__meta">' + tags + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="today-card__reason">' +
+            '<div class="today-card__reason-title">' +
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>' +
+              ' 이 책을 추천하는 이유' +
+            '</div>' +
+            '<p class="today-card__reason-text">' + todayBook.reason + '</p>' +
+          '</div>' +
+          '<div class="review-section">' +
+            renderReviewsHtml(grade, todayIdx) +
+          '</div>' +
+          '<div class="buy-links">' +
+            '<div class="buy-links__title">\u{1F6D2} 이 책 구매하기</div>' +
+            renderBuyLinksHtml(todayBook.title) +
+          '</div>' +
+        '</article>';
+
+      // 해당 학년의 모든 태그 수집
+      var allTags = {};
+      for (var i = 0; i < books.length; i++) {
+        for (var t = 0; t < books[i].tags.length; t++) {
+          allTags[books[i].tags[t]] = true;
+        }
+      }
+      var tagList = Object.keys(allTags).sort();
+
+      // 태그 필터 버튼 HTML
+      var tagBtns = '';
+      for (var ti = 0; ti < tagList.length; ti++) {
+        tagBtns += '<button class="tag-btn" data-filter-tag="' + tagList[ti] + '">' + tagList[ti] + '</button>';
+      }
+
+      var readCount = getReadCount(grade);
+      var total = books.length;
+      var pct = (readCount / total * 100);
+
+      html += '<section class="other-books">' +
+        '<h3 class="other-books__title">' +
+          '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>' +
+          grade + '학년 ' + (category !== '전체' ? category + ' ' : '') + '도서 목록' +
+        '</h3>' +
+        '<div class="progress-bar">' +
+          '<span class="progress-bar__label">\u{1F4DA} 읽기 진행률</span>' +
+          '<div class="progress-bar__track"><div class="progress-bar__fill" id="progressFill" style="width:' + pct + '%"></div></div>' +
+          '<span class="progress-bar__count" id="progressCount">' + readCount + ' / ' + total + '권 읽음</span>' +
+        '</div>' +
+        '<div class="search-bar">' +
+          '<div class="search-bar__input-wrap">' +
+            '<svg class="search-bar__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' +
+            '<input class="search-bar__input" id="searchInput" type="text" placeholder="제목 또는 저자로 검색..." />' +
+          '</div>' +
+          '<div class="search-bar__controls">' +
+            '<span class="search-bar__label">태그</span>' +
+            tagBtns +
+            '<select class="sort-select" id="sortSelect">' +
+              '<option value="default">기본 순서</option>' +
+              '<option value="title-asc">제목 ㄱ-ㅎ</option>' +
+              '<option value="title-desc">제목 ㅎ-ㄱ</option>' +
+              '<option value="author-asc">저자 ㄱ-ㅎ</option>' +
+            '</select>' +
+          '</div>' +
+          '<div class="search-bar__count" id="searchCount"></div>' +
+        '</div>' +
+        '<div id="bookListContainer">';
+
+      for (var i = 0; i < books.length; i++) {
+        var book = books[i];
+        var origIdx = getOriginalIndex(grade, book);
+        var cc = COVER_COLORS[origIdx % COVER_COLORS.length];
+        var be = BOOK_EMOJI[origIdx % BOOK_EMOJI.length];
+        var isToday = (origIdx === todayIdx);
+        var dayLabel = isToday ? '\u{1F4CC} 오늘' : (i+1) + '일차';
+        var bookTags = book.tags.join(',');
+        var readClass = isRead(grade, origIdx) ? ' book-list-item--read' : '';
+        var favActive = isFav(grade, origIdx);
+        var readActive = isRead(grade, origIdx);
+        html += '<div class="book-list-item' + (isToday ? ' book-list-item--today' : '') + readClass + '" data-idx="' + origIdx + '" data-title="' + book.title + '" data-author="' + book.author + '" data-tags="' + bookTags + '" onclick="openModal(' + grade + ',' + origIdx + ')" style="cursor:pointer">' +
+          '<div class="book-list-item__cover" style="background:' + cc + '">' + be + '</div>' +
+          '<div class="book-list-item__info">' +
+            '<div class="book-list-item__title">' + book.title + (book.comic ? ' <span class="book-list-item__comic">만화</span>' : '') + '</div>' +
+            '<div class="book-list-item__author">' + book.author + '</div>' +
+          '</div>' +
+          '<div class="book-list-item__actions">' +
+            '<button class="icon-btn' + (favActive ? ' icon-btn--active' : '') + '" onclick="event.stopPropagation();toggleFav(' + grade + ',' + origIdx + ');navigate(\'recommend\',{grade:' + grade + ',category:\'' + category + '\'})" title="즐겨찾기">' + (favActive ? '\u{1F49B}' : '\u{1F90D}') + '</button>' +
+            '<button class="icon-btn' + (readActive ? ' icon-btn--read-active' : '') + '" onclick="event.stopPropagation();toggleRead(' + grade + ',' + origIdx + ');refreshBookList(' + grade + ')" title="읽음 표시">' + (readActive ? '✅' : '\u{1F4D6}') + '</button>' +
+          '</div>' +
+          '<div class="book-list-item__day">' + dayLabel + '</div>' +
+        '</div>';
+      }
+
+      html += '</div></section></div>';
+      return html;
+    }
+
+    var activeTag = null;
+
+    function applyFilters() {
+      var query = document.getElementById('searchInput').value.trim().toLowerCase();
+      var sortVal = document.getElementById('sortSelect').value;
+      var container = document.getElementById('bookListContainer');
+      var items = Array.from(container.querySelectorAll('.book-list-item'));
+      var visibleCount = 0;
+
+      // 검색 + 태그 필터
+      items.forEach(function(el) {
+        var title = (el.dataset.title || '').toLowerCase();
+        var author = (el.dataset.author || '').toLowerCase();
+        var elTags = (el.dataset.tags || '').toLowerCase();
+
+        var matchesQuery = !query || title.indexOf(query) >= 0 || author.indexOf(query) >= 0;
+        var matchesTag = !activeTag || elTags.indexOf(activeTag.toLowerCase()) >= 0;
+
+        if (matchesQuery && matchesTag) {
+          el.classList.remove('book-list-item--hidden');
+          visibleCount++;
+        } else {
+          el.classList.add('book-list-item--hidden');
+        }
+      });
+
+      // 정렬
+      if (sortVal !== 'default') {
+        var visible = items.filter(function(el) { return !el.classList.contains('book-list-item--hidden'); });
+        visible.sort(function(a, b) {
+          var va, vb;
+          if (sortVal === 'title-asc') { va = a.dataset.title; vb = b.dataset.title; }
+          else if (sortVal === 'title-desc') { va = b.dataset.title; vb = a.dataset.title; }
+          else if (sortVal === 'author-asc') { va = a.dataset.author; vb = b.dataset.author; }
+          return va.localeCompare(vb, 'ko');
+        });
+        visible.forEach(function(el) { container.appendChild(el); });
+      }
+
+      // 결과 카운트
+      var countEl = document.getElementById('searchCount');
+      if (query || activeTag) {
+        countEl.textContent = '\u{1F50D} ' + visibleCount + '권 검색됨';
+      } else {
+        countEl.textContent = '';
+      }
+    }
+
+    function bindRecommendEvents() {
+      var searchInput = document.getElementById('searchInput');
+      if (!searchInput) return;
+
+      searchInput.addEventListener('input', applyFilters);
+      document.getElementById('sortSelect').addEventListener('change', applyFilters);
+
+      document.querySelectorAll('[data-filter-tag]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var tag = btn.dataset.filterTag;
+          if (activeTag === tag) {
+            activeTag = null;
+            btn.classList.remove('tag-btn--active');
+          } else {
+            document.querySelectorAll('.tag-btn--active').forEach(function(b) { b.classList.remove('tag-btn--active'); });
+            activeTag = tag;
+            btn.classList.add('tag-btn--active');
+          }
+          applyFilters();
+        });
+      });
+    }
+
+    function render() {
+      var pageContent = '';
+      if (currentPage === 'home') {
+        pageContent = renderHomePage();
+      } else if (currentPage === 'category') {
+        pageContent = renderCategoryPage(currentParams.grade || 1);
+      } else if (currentPage === 'recommend') {
+        pageContent = renderRecommendPage(currentParams.grade || 1, currentParams.category || '전체');
+      }
+      document.getElementById('app').innerHTML =
+        renderHeader() + '<main>' + pageContent + '</main>' + renderFooter();
+
+      if (currentPage === 'recommend') {
+        activeTag = null;
+        bindRecommendEvents();
+      }
+    }
+
+    window.addEventListener('scroll', function() {
+      var header = document.querySelector('.header');
+      if (header) {
+        if (window.scrollY > 10) header.classList.add('header--scrolled');
+        else header.classList.remove('header--scrolled');
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>

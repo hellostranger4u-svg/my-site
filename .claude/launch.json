@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "book-daily",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "C:\\Users\\mdj12\\Desktop\\book-daily", "-l", "3000", "--no-clipboard"],
+      "port": 3000
+    }
+  ]
+}
