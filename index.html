@@ -14,10 +14,17 @@
   <meta property="og:url" content="https://onti.kr/" />
   <meta property="og:locale" content="ko_KR" />
   <meta property="og:site_name" content="오늘의 한 권" />
-  <meta name="twitter:card" content="summary" />
+  <!-- TODO(디자인팀): /og-image.png (1200x630, 2MB 이하) 실제 파일 제작 후 배포 필요. 파일이 없으면 아래 태그는 카톡/트위터/페이스북 공유 미리보기에서 이미지 없이 노출됨 -->
+  <meta property="og:image" content="https://onti.kr/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="오늘의 한 권 — 초등학생 추천 도서 서비스" />
+  <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="오늘의 한 권 — 초등학생 추천 도서" />
   <meta name="twitter:description" content="초등학교 1~6학년 맞춤 도서 추천 서비스. 매일 한 권, 문학·비문학 360권의 엄선된 어린이 도서를 만나보세요." />
+  <meta name="twitter:image" content="https://onti.kr/og-image.png" />
   <meta name="robots" content="index, follow" />
+  <meta name="google-site-verification" content="여기에_Search_Console에서_발급받은_인증코드를_붙여넣으세요" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3475631029340601"
@@ -32,8 +39,19 @@
     "inLanguage": "ko",
     "publisher": {
       "@type": "Organization",
-      "name": "오늘의 한 권"
+      "name": "오늘의 한 권",
+      "url": "https://onti.kr/"
     }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "오늘의 한 권",
+    "url": "https://onti.kr/",
+    "description": "초등학교 1~6학년 맞춤 도서 추천 서비스를 제공하는 어린이 독서 교육 사이트",
+    "email": "hellostranger4u@gmail.com"
   }
   </script>
   <style>
@@ -1942,14 +1960,45 @@
       });
     }
 
+    function injectBookSchema(book, grade) {
+      var existing = document.getElementById('book-schema');
+      if (existing) existing.remove();
+      if (!book) return;
+      var script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.id = 'book-schema';
+      script.text = JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Book',
+        'name': book.title,
+        'author': { '@type': 'Person', 'name': book.author },
+        'genre': book.category,
+        'keywords': book.tags.join(', '),
+        'description': book.reason,
+        'inLanguage': 'ko',
+        'audience': {
+          '@type': 'Audience',
+          'audienceType': grade + '학년 초등학생'
+        }
+      });
+      document.head.appendChild(script);
+    }
+
     function render() {
       var pageContent = '';
+      var schemaBook = null, schemaGrade = null;
       if (currentPage === 'home') {
         pageContent = renderHomePage();
       } else if (currentPage === 'category') {
         pageContent = renderCategoryPage(currentParams.grade || 1);
       } else if (currentPage === 'recommend') {
-        pageContent = renderRecommendPage(currentParams.grade || 1, currentParams.category || '전체');
+        var g = currentParams.grade || 1;
+        var cat = currentParams.category || '전체';
+        pageContent = renderRecommendPage(g, cat);
+        var fb = getFilteredBooks(g, cat);
+        var ti = (getTodayBookIndex(g) + getRefreshOffset(g)) % fb.length;
+        schemaBook = fb[ti];
+        schemaGrade = g;
       } else if (currentPage === 'privacy') {
         pageContent = renderPrivacyPage();
       } else if (currentPage === 'about') {
@@ -1959,6 +2008,8 @@
       }
       document.getElementById('app').innerHTML =
         renderHeader() + '<main>' + pageContent + '</main>' + renderFooter();
+
+      injectBookSchema(schemaBook, schemaGrade);
 
       if (currentPage === 'recommend') {
         activeTag = null;
