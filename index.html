@@ -27,8 +27,9 @@
   <meta name="google-site-verification" content="m97gYdBtG7sBv3xZRpmPOQrkGe8FVl1D7aQYjkUTC54" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3475631029340601"
-     crossorigin="anonymous"></script>
+  <!-- AdSense 로더는 <head>에서 즉시 실행하지 않고, body 하단 스크립트에서 초기 콘텐츠 렌더링이
+       끝난 뒤 동적으로 삽입합니다. (사유: async 스크립트가 다운로드 완료 시점에 즉시 실행되면
+       #app이 비어있는 상태(콘텐츠 없는 화면)에서 광고 스캔이 이루어질 수 있음 — AdSense 반려 사유 대응) -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -901,7 +902,64 @@
   </style>
 </head>
 <body>
-  <div id="app"></div>
+  <!-- 초기 정적 폴백 콘텐츠: JS 실행 전(또는 실행 실패 시)에도 검색엔진·광고 검수봇이
+       빈 화면이 아닌 실제 콘텐츠를 즉시 확인할 수 있도록 삽입. 페이지 하단 스크립트의
+       render() 호출 시 동일 구조로 즉시 교체되므로 정상 사용자에게는 시각적 차이가 없음. -->
+  <div id="app">
+    <header class="header"><div class="container header__inner">
+      <button class="header__logo" onclick="navigate('home')">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          <line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="13" y2="11"/>
+        </svg> 오늘의 한 권
+      </button>
+      <nav class="header__nav">
+        <button class="btn btn--outline header__nav-btn" onclick="navigate('home')">학년 선택</button>
+      </nav>
+    </div></header>
+    <main>
+      <section class="hero">
+        <h1>오늘의 한 권 📖</h1>
+        <p>학년을 선택하면 매일 한 권의 추천 도서를 만나볼 수 있어요! 초등학교 1~6학년 눈높이에 맞춘 문학·비문학 360권을 엄선해 매일 새로운 책을 추천하는 무료 독서 습관 서비스입니다.</p>
+      </section>
+      <section class="grade-grid container">
+        <button class="grade-card" style="--grade-color:var(--accent)" onclick="navigate('category',{grade:1})">
+          <span class="grade-card__emoji">🌱</span><span class="grade-card__label">1학년</span><span class="grade-card__sub">추천 도서 보기</span>
+        </button>
+        <button class="grade-card" style="--grade-color:var(--green)" onclick="navigate('category',{grade:2})">
+          <span class="grade-card__emoji">🌿</span><span class="grade-card__label">2학년</span><span class="grade-card__sub">추천 도서 보기</span>
+        </button>
+        <button class="grade-card" style="--grade-color:var(--yellow)" onclick="navigate('category',{grade:3})">
+          <span class="grade-card__emoji">🌻</span><span class="grade-card__label">3학년</span><span class="grade-card__sub">추천 도서 보기</span>
+        </button>
+        <button class="grade-card" style="--grade-color:var(--primary)" onclick="navigate('category',{grade:4})">
+          <span class="grade-card__emoji">🌳</span><span class="grade-card__label">4학년</span><span class="grade-card__sub">추천 도서 보기</span>
+        </button>
+        <button class="grade-card" style="--grade-color:var(--accent)" onclick="navigate('category',{grade:5})">
+          <span class="grade-card__emoji">⭐</span><span class="grade-card__label">5학년</span><span class="grade-card__sub">추천 도서 보기</span>
+        </button>
+        <button class="grade-card" style="--grade-color:var(--green)" onclick="navigate('category',{grade:6})">
+          <span class="grade-card__emoji">🚀</span><span class="grade-card__label">6학년</span><span class="grade-card__sub">추천 도서 보기</span>
+        </button>
+      </section>
+    </main>
+    <footer class="footer"><div class="container">
+      <p>&copy; 2026 오늘의 한 권 &mdash; 매일 한 권, 읽는 습관을 만들어요 📚</p>
+      <div class="footer__links">
+        <button onclick="navigate('about')">소개</button>
+        <button onclick="navigate('privacy')">개인정보처리방침</button>
+        <button onclick="navigate('contact')">문의하기</button>
+      </div>
+    </div></footer>
+  </div>
+
+  <noscript>
+    <div style="max-width:680px;margin:40px auto;padding:0 20px;font-family:sans-serif;line-height:1.7;color:#333;">
+      <p><strong>이 사이트는 학년 선택, 도서 상세 정보 열람, 즐겨찾기·읽음 표시 기능을 이용하려면 자바스크립트(JavaScript)가 필요합니다.</strong> 브라우저 설정에서 자바스크립트를 활성화한 뒤 다시 방문해주세요.</p>
+      <p>문의: <a href="mailto:hellostranger4u@gmail.com">hellostranger4u@gmail.com</a></p>
+    </div>
+  </noscript>
 
   <script>
     var GRADE_COLORS = [
@@ -2010,11 +2068,58 @@
         renderHeader() + '<main>' + pageContent + '</main>' + renderFooter();
 
       injectBookSchema(schemaBook, schemaGrade);
+      updateMetaTags(currentPage, currentParams, schemaBook);
 
       if (currentPage === 'recommend') {
         activeTag = null;
         bindRecommendEvents();
       }
+    }
+
+    // 페이지(해시 상태) 전환 시 title/description/OG/Twitter 메타태그를 갱신합니다.
+    // 주의: canonical URL은 의도적으로 변경하지 않습니다. 해시(#) 라우팅에서는 서버가 인지하는
+    // 실제 URL 경로가 모두 동일(https://onti.kr/)하므로, 페이지별 canonical 분리는
+    // History API(pushState) 전환 후에만 SEO적으로 의미가 있습니다. (하단 SEO 개선 계획 참조)
+    function updateMetaTags(page, params, book) {
+      var base = ' | 오늘의 한 권';
+      var title, desc;
+      if (page === 'category') {
+        var g = (params && params.grade) || 1;
+        title = g + '학년 추천 도서' + base;
+        desc = '초등학교 ' + g + '학년 학생을 위한 문학·비문학 추천 도서 목록. 매일 새로운 책 한 권을 만나보세요.';
+      } else if (page === 'recommend' && book) {
+        var g2 = (params && params.grade) || 1;
+        title = book.title + ' - ' + g2 + '학년 오늘의 추천 도서' + base;
+        desc = '초등학교 ' + g2 + '학년 추천 도서 「' + book.title + '」(' + book.author + '). ' + book.reason;
+      } else if (page === 'privacy') {
+        title = '개인정보처리방침' + base;
+        desc = '오늘의 한 권 개인정보처리방침 안내 페이지입니다.';
+      } else if (page === 'about') {
+        title = '서비스 소개' + base;
+        desc = '오늘의 한 권 서비스 소개 — 초등학생을 위한 학년별 매일 도서 추천 서비스입니다.';
+      } else if (page === 'contact') {
+        title = '문의하기' + base;
+        desc = '오늘의 한 권 서비스 문의 및 제안을 남겨주세요.';
+      } else {
+        title = '오늘의 한 권 — 초등학생 추천 도서';
+        desc = '초등학교 1~6학년 맞춤 도서 추천 서비스. 매일 한 권, 문학·비문학 360권의 엄선된 어린이 도서를 만나보세요.';
+      }
+
+      document.title = title;
+      var setMeta = function(selector) {
+        var el = document.querySelector(selector);
+        return el;
+      };
+      var descTag = setMeta('meta[name="description"]');
+      if (descTag) descTag.setAttribute('content', desc);
+      var ogTitle = setMeta('meta[property="og:title"]');
+      if (ogTitle) ogTitle.setAttribute('content', title);
+      var ogDesc = setMeta('meta[property="og:description"]');
+      if (ogDesc) ogDesc.setAttribute('content', desc);
+      var twTitle = setMeta('meta[name="twitter:title"]');
+      if (twTitle) twTitle.setAttribute('content', title);
+      var twDesc = setMeta('meta[name="twitter:description"]');
+      if (twDesc) twDesc.setAttribute('content', desc);
     }
 
     window.addEventListener('scroll', function() {
@@ -2029,6 +2134,19 @@
     currentPage = initState.page;
     currentParams = initState.params;
     render();
+
+    // AdSense 로더를 초기 콘텐츠 렌더링 이후에 동적으로 삽입합니다.
+    // 목적: async 스크립트가 <head>에서 즉시 실행되면 #app이 비어있는(콘텐츠 없는) 상태에서
+    // 광고 스캔이 이루어질 수 있어 "게시자 콘텐츠가 없는 화면에 광고 게재" 반려 사유의 원인이
+    // 될 수 있음. render() 완료 후 로드하도록 하여 광고 스캔 시점에 실제 콘텐츠가 DOM에
+    // 존재하도록 보장합니다.
+    (function loadAdsenseAfterContent() {
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3475631029340601';
+      s.crossOrigin = 'anonymous';
+      document.head.appendChild(s);
+    })();
   </script>
 </body>
 </html>
